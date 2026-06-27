@@ -19,10 +19,6 @@
         android:title="@string/reboot_bootloader" />
 
     <item
-        android:id="@+id/action_reboot_edl"
-        android:title="@string/reboot_edl" />
-
-    <item
         android:id="@+id/action_reboot_safe_mode"
         android:checkable="true"
         android:title="@string/reboot_safe_mode" />

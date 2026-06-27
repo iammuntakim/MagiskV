@@ -36,7 +36,7 @@
                 android:padding="@dimen/l_25"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_supersu_outline" />
+                app:srcCompat="@drawable/ic_supersu" />
 
             <TextView
                 android:id="@+id/home_supersu_title"
