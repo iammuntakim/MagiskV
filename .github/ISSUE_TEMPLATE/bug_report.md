@@ -12,13 +12,13 @@ assignees: ""
 
 All bug reports require you to **USE DEBUG BUILDS**. Please include the version name and version code in the bug report.
 
-If you experience a bootloop, attach a `dmesg` (kernel logs) when the device refuse to boot. This may very likely require a custom kernel on some devices as `last_kmsg` or `pstore ramoops` are usually not enabled by default. In addition, please also upload the result of `cat /proc/mounts` when your device is working correctly **WITHOUT MAGISK**.
+If you experience a bootloop, attach a `dmesg` (kernel logs) when the device refuse to boot. This may very likely require a custom kernel on some devices as `last_kmsg` or `pstore ramoops` are usually not enabled by default. In addition, please also upload the result of `cat /proc/mounts` when your device is working correctly **WITHOUT SUPERSU**.
 
-If you experience issues during installation, in recovery, upload the recovery logs, or in Magisk, upload the install logs. Please also upload the `boot.img` or `recovery.img` that you are using for patching.
+If you experience issues during installation, in recovery, upload the recovery logs, or in SuperSU, upload the install logs. Please also upload the `boot.img` or `recovery.img` that you are using for patching.
 
-If you experience a crash of Magisk app, dump the full `logcat` **when the crash happens**.
+If you experience a crash of SuperSU app, dump the full `logcat` **when the crash happens**.
 
-If you experience other issues related to Magisk, upload `magisk.log`, and preferably also include a boot `logcat` (start dumping `logcat` when the device boots up)
+If you experience other issues related to SuperSU, upload `SuperSU.log`, and preferably also include a boot `logcat` (start dumping `logcat` when the device boots up)
 
 **DO NOT** open issues regarding root detection.
 
@@ -32,5 +32,5 @@ Without following the rules above, your issue will be closed without explanation
 
 Device:
 Android version:
-Magisk version name:
-Magisk version code:
+SuperSU version name:
+SuperSU version code:

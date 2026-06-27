@@ -1,4 +1,4 @@
-name: Build MagiskV
+name: Build SuperSU
 
 on:
     push:
@@ -70,7 +70,7 @@ jobs:
               uses: ./.github/actions/setup
               with:
                   is-asset-build: true
-            - name: Build Magisk
+            - name: Build SuperSU
               run: |
                   if [ "${{ matrix.build_type }}" = "release" ]; then
                       python build.py -vr all
@@ -83,7 +83,7 @@ jobs:
             - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: magisk_${{ matrix.build_type }}
+                  name: supersu_${{ matrix.build_type }}
                   path: out/app-release.apk
 
             - name: Create GitHub Release
@@ -100,7 +100,7 @@ jobs:
                   commit=$(git rev-parse --short HEAD)
                   branch=${GITHUB_REF#refs/heads/}
                   build_time=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-                  body=$(printf "MagiskV automated build\n\nBranch: %s\nCommit: %s\nBuild type: %s\nBuild time: %s\nActor: %s\nRepository: %s\n" \
+                  body=$(printf "SuperSU automated build\n\nBranch: %s\nCommit: %s\nBuild type: %s\nBuild time: %s\nActor: %s\nRepository: %s\n" \
                       "$branch" \
                       "$commit" \
                       "${{ matrix.build_type }}" \
@@ -113,5 +113,5 @@ jobs:
                   git tag "$tag"
                   git push origin "$tag"
                   gh release create "$tag" "$file" \
-                      --title "MagiskV $tag" \
+                      --title "SuperSU $tag" \
                       --notes "$body"

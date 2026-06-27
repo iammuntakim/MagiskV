@@ -1,28 +1,28 @@
 #####################################################################
-#   AVD Magisk Setup
+#   AVD SuperSU Setup
 #####################################################################
 #
 # Support API level: 23 - 36
 #
-# For developing Magisk, just use:
+# For developing SuperSU, just use:
 # ./build.py emulator
 #
-# This script will stop zygote, simulate the Magisk start up process
+# This script will stop zygote, simulate the SuperSU start up process
 # that would've happened before zygote was started, and finally
 # restart zygote. This is useful for setting up the emulator for
-# developing Magisk, testing modules, and developing root apps using
+# developing SuperSU, testing modules, and developing root apps using
 # the official Android emulator (AVD) instead of a real device.
 #
-# This only covers the "core" features of Magisk. For testing
-# magiskinit, please checkout avd_patch.sh.
+# This only covers the "core" features of SuperSU. For testing
+# supersuinit, please checkout avd_patch.sh.
 #
 #####################################################################
 
 mount_tmpfs() {
-  # If a file name 'magisk' is in current directory, mount will fail
-  mv magisk magisk.tmp
-  mount -t tmpfs -o 'mode=0755' magisk $1
-  mv magisk.tmp magisk
+  # If a file name 'supersu' is in current directory, mount will fail
+  mv supersu supersu.tmp
+  mount -t tmpfs -o 'mode=0755' supersu $1
+  mv supersu.tmp supersu
 }
 
 mount_sbin() {
@@ -51,28 +51,28 @@ if [ -z "$FIRST_STAGE" ]; then
   fi
 fi
 
-pm install -r -g $(pwd)/magisk.apk
+pm install -r -g $(pwd)/supersu.apk
 
 # Extract files from APK
-unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
+unzip -oj supersu.apk 'assets/util_functions.sh' 'assets/stub.apk'
 . ./util_functions.sh
 
 api_level_arch_detect
 
-unzip -oj magisk.apk "lib/$ABI/*" -x "lib/$ABI/libbusybox.so"
+unzip -oj supersu.apk "lib/$ABI/*" -x "lib/$ABI/libbusybox.so"
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"
 done
 
 if $IS64BIT && [ -e "/system/bin/linker" ]; then
-  unzip -oj magisk.apk "lib/$ABI32/libmagisk.so"
-  mv libmagisk.so magisk32
-  chmod 755 magisk32
+  unzip -oj supersu.apk "lib/$ABI32/libsupersu.so"
+  mv libsupersu.so supersu32
+  chmod 755 supersu32
 fi
 
 # Stop zygote (and previous setup if exists)
-magisk --stop 2>/dev/null
+supersu --stop 2>/dev/null
 stop
 if [ -d /debug_ramdisk ]; then
   umount -l /debug_ramdisk 2>/dev/null
@@ -86,7 +86,7 @@ if ! grep -q ' /cache ' /proc/mounts; then
   mount -t tmpfs -o 'mode=0755' tmpfs /cache
 fi
 
-MAGISKTMP=/sbin
+SUPERSUTMP=/sbin
 
 # Setup bin overlay
 if mount | grep -q rootfs; then
@@ -120,58 +120,58 @@ elif [ -e /sbin ]; then
   rm -rf /dev/sysroot
 else
   # Android Q+ without sbin
-  MAGISKTMP=/debug_ramdisk
+  SUPERSUTMP=/debug_ramdisk
   mount_tmpfs /debug_ramdisk
 fi
 
-# Magisk stuff
-mkdir -p $MAGISKBIN 2>/dev/null
-unzip -oj magisk.apk 'assets/*.sh' -d $MAGISKBIN
+# SuperSU stuff
+mkdir -p $SUPERSUBIN 2>/dev/null
+unzip -oj supersu.apk 'assets/*.sh' -d $SUPERSUBIN
 mkdir /data/adb/modules 2>/dev/null
 mkdir /data/adb/post-fs-data.d 2>/dev/null
 mkdir /data/adb/service.d 2>/dev/null
 
-for file in magisk magisk32 magiskpolicy stub.apk; do
+for file in supersu supersu32 supersupolicy stub.apk; do
   chmod 755 ./$file
-  cp -af ./$file $MAGISKTMP/$file
-  cp -af ./$file $MAGISKBIN/$file
+  cp -af ./$file $SUPERSUTMP/$file
+  cp -af ./$file $SUPERSUBIN/$file
 done
-cp -af ./magiskboot $MAGISKBIN/magiskboot
-cp -af ./magiskinit $MAGISKBIN/magiskinit
-cp -af ./busybox $MAGISKBIN/busybox
+cp -af ./supersuboot $SUPERSUBIN/supersuboot
+cp -af ./supersuinit $SUPERSUBIN/supersuinit
+cp -af ./busybox $SUPERSUBIN/busybox
 
-ln -s ./magisk $MAGISKTMP/su
-ln -s ./magisk $MAGISKTMP/resetprop
-ln -s ./magiskpolicy $MAGISKTMP/supolicy
+ln -s ./supersu $SUPERSUTMP/su
+ln -s ./supersu $SUPERSUTMP/resetprop
+ln -s ./supersupolicy $SUPERSUTMP/supolicy
 
-mkdir -p $MAGISKTMP/.magisk/device
-mkdir -p $MAGISKTMP/.magisk/worker
-mount_tmpfs $MAGISKTMP/.magisk/worker
-mount --make-private $MAGISKTMP/.magisk/worker
-touch $MAGISKTMP/.magisk/config
+mkdir -p $SUPERSUTMP/.supersu/device
+mkdir -p $SUPERSUTMP/.supersu/worker
+mount_tmpfs $SUPERSUTMP/.supersu/worker
+mount --make-private $SUPERSUTMP/.supersu/worker
+touch $SUPERSUTMP/.supersu/config
 
-export MAGISKTMP
-MAKEDEV=1 $MAGISKTMP/magisk --preinit-device 2>&1
+export SUPERSUTMP
+MAKEDEV=1 $SUPERSUTMP/supersu --preinit-device 2>&1
 
 RULESCMD=""
-rule="$MAGISKTMP/.magisk/preinit/sepolicy.rule"
+rule="$SUPERSUTMP/.supersu/preinit/sepolicy.rule"
 [ -f "$rule" ] && RULESCMD="--apply $rule"
 
 # SELinux stuffs
 if [ -d /sys/fs/selinux ]; then
   if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
-    ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk $RULESCMD 2>&1
+    ./supersupolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --supersu $RULESCMD 2>&1
   elif [ -f /sepolicy ]; then
-    ./magiskpolicy --load /sepolicy --live --magisk $RULESCMD 2>&1
+    ./supersupolicy --load /sepolicy --live --supersu $RULESCMD 2>&1
   else
-    ./magiskpolicy --live --magisk $RULESCMD 2>&1
+    ./supersupolicy --live --supersu $RULESCMD 2>&1
   fi
 fi
 
 # Boot up
-$MAGISKTMP/magisk --post-fs-data
+$SUPERSUTMP/supersu --post-fs-data
 start
-$MAGISKTMP/magisk --service
+$SUPERSUTMP/supersu --service
 # Make sure reset nb prop after zygote starts
 sleep 2
-$MAGISKTMP/magisk --boot-complete
+$SUPERSUTMP/supersu --boot-complete

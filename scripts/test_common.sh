@@ -50,9 +50,9 @@ wait_for_pm() {
 
 run_setup() {
   local variant=$1
-  adb shell 'PATH=$PATH:/debug_ramdisk magisk -v'
+  adb shell 'PATH=$PATH:/debug_ramdisk supersu -v'
 
-  # Install the Magisk app
+  # Install the SuperSU app
   adb install -r -g out/app-${variant}.apk
 
   # Install the test app
@@ -71,17 +71,17 @@ run_tests() {
   local stub="repackaged.$pkg/$pkg.AppTestRunner"
 
   # Run app tests
-  am_instrument '.MagiskAppTest,.AdditionalTest' $app
+  am_instrument '.SuperSUAppTest,.AdditionalTest' $app
 
   # Test app hiding
   am_instrument '.AppMigrationTest#testAppHide' $self
 
   # Make sure it still works
-  am_instrument '.MagiskAppTest' $stub
+  am_instrument '.SuperSUAppTest' $stub
 
   # Test app restore
   am_instrument '.AppMigrationTest#testAppRestore' $self
 
   # Make sure it still works
-  am_instrument '.MagiskAppTest' $app
+  am_instrument '.SuperSUAppTest' $app
 }

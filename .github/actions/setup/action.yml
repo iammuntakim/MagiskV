@@ -1,4 +1,4 @@
-name: Magisk Setup
+name: SuperSU Setup
 inputs:
   is-asset-build:
     required: false

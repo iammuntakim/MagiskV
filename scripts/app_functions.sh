@@ -1,5 +1,5 @@
 ##################################
-# Magisk app internal scripts
+# SuperSU app internal scripts
 ##################################
 
 # $1 = delay
@@ -11,17 +11,17 @@ run_delay() {
 # $1 = version string
 # $2 = version code
 env_check() {
-  for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
-    [ -f "$MAGISKBIN/$file" ] || return 1
+  for file in busybox supersuboot supersuinit util_functions.sh boot_patch.sh; do
+    [ -f "$SUPERSUBIN/$file" ] || return 1
   done
   if [ "$2" -ge 25000 ]; then
-    [ -f "$MAGISKBIN/magiskpolicy" ] || return 1
+    [ -f "$SUPERSUBIN/supersupolicy" ] || return 1
   fi
   if [ "$2" -ge 25210 ]; then
-    [ -b "$MAGISKTMP/.magisk/device/preinit" ] || [ -b "$MAGISKTMP/.magisk/block/preinit" ] || return 2
+    [ -b "$SUPERSUTMP/.supersu/device/preinit" ] || [ -b "$SUPERSUTMP/.supersu/block/preinit" ] || return 2
   fi
-  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 3
-  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 3
+  grep -xqF "SUPERSU_VER='$1'" "$SUPERSUBIN/util_functions.sh" || return 3
+  grep -xqF "SUPERSU_VER_CODE=$2" "$SUPERSUBIN/util_functions.sh" || return 3
   return 0
 }
 
@@ -48,12 +48,12 @@ cp_readlink() {
 # $1 = install dir
 fix_env() {
   # Cleanup and make dirs
-  rm -rf $MAGISKBIN/*
-  mkdir -p $MAGISKBIN 2>/dev/null
+  rm -rf $SUPERSUBIN/*
+  mkdir -p $SUPERSUBIN 2>/dev/null
   chmod 700 /data/adb
-  cp_readlink $1 $MAGISKBIN
+  cp_readlink $1 $SUPERSUBIN
   rm -rf $1
-  chown -R 0:0 $MAGISKBIN
+  chown -R 0:0 $SUPERSUBIN
 }
 
 # $1 = install dir
@@ -89,8 +89,8 @@ run_uninstaller() {
 
 # $1 = boot partition
 restore_imgs() {
-  local SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
-  local BACKUPDIR=/data/magisk_backup_$SHA1
+  local SHA1=$(grep_prop SHA1 $SUPERSUTMP/.supersu/config)
+  local BACKUPDIR=/data/supersu_backup_$SHA1
   [ -d $BACKUPDIR ] || return 1
   [ -f $BACKUPDIR/boot.img.gz ] || return 1
   flash_image $BACKUPDIR/boot.img.gz $1

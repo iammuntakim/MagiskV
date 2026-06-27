@@ -1,8 +1,8 @@
 ############################################
-# Magisk General Utility Functions
+# SuperSU General Utility Functions
 ############################################
 
-#MAGISK_VERSION_STUB
+#SUPERSU_VERSION_STUB
 
 ###################
 # Global Variables
@@ -14,8 +14,8 @@
 # The path to store temporary files that don't need to persist
 # TMPDIR=
 
-# The non-volatile path where magisk executables are stored
-# MAGISKBIN=
+# The non-volatile path where supersu executables are stored
+# SUPERSUBIN=
 
 ###################
 # Helper Functions
@@ -61,8 +61,8 @@ grep_get_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE
-  local PROPPATH='/data/.magisk /cache/.magisk'
-  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/.magisk/config $PROPPATH"
+  local PROPPATH='/data/.supersu /cache/.supersu'
+  [ ! -z $SUPERSUTMP ] && PROPPATH="$SUPERSUTMP/.supersu/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
@@ -126,8 +126,8 @@ ensure_bb() {
   local bb
   if [ -f $TMPDIR/busybox ]; then
     bb=$TMPDIR/busybox
-  elif [ -f $MAGISKBIN/busybox ]; then
-    bb=$MAGISKBIN/busybox
+  elif [ -f $SUPERSUBIN/busybox ]; then
+    bb=$SUPERSUBIN/busybox
   else
     abort "! Cannot find BusyBox"
   fi
@@ -427,8 +427,8 @@ flash_image() {
 }
 
 # Common installation script for flash_script.sh and addon.d.sh
-install_magisk() {
-  cd $MAGISKBIN
+install_supersu() {
+  cd $SUPERSUBIN
 
   # Source the boot patcher
   SOURCEDMODE=true
@@ -445,7 +445,7 @@ install_magisk() {
       ;;
   esac
 
-  ./magiskboot cleanup
+  ./supersuboot cleanup
   rm -f new-boot.img
 
   run_migrations
@@ -533,18 +533,18 @@ check_data() {
     touch /data/.rw && rm /data/.rw && DATA=true
     # Test if data is decrypted
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
-    $DATA_DE && [ -d /data/adb/magisk ] || mkdir /data/adb/magisk || DATA_DE=false
+    $DATA_DE && [ -d /data/adb/supersu ] || mkdir /data/adb/supersu || DATA_DE=false
   fi
-  MAGISKBIN="/data/magisk"
-  $DATA || MAGISKBIN="/cache/data_adb/magisk"
-  $DATA_DE && MAGISKBIN="/data/adb/magisk"
+  SUPERSUBIN="/data/supersu"
+  $DATA || SUPERSUBIN="/cache/data_adb/supersu"
+  $DATA_DE && SUPERSUBIN="/data/adb/supersu"
 }
 
 run_migrations() {
   local SHA1
   local TARGET
   # Legacy app installation
-  local BACKUP=$MAGISKBIN/stock_boot*.gz
+  local BACKUP=$SUPERSUBIN/stock_boot*.gz
   if [ -f $BACKUP ]; then
     cp $BACKUP /data
     rm -f $BACKUP
@@ -555,21 +555,21 @@ run_migrations() {
     [ -f $gz ] || break
     SHA1=$(basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//')
     [ -z $SHA1 ] && break
-    mkdir /data/magisk_backup_${SHA1} 2>/dev/null
-    mv $gz /data/magisk_backup_${SHA1}/boot.img.gz
+    mkdir /data/supersu_backup_${SHA1} 2>/dev/null
+    mv $gz /data/supersu_backup_${SHA1}/boot.img.gz
   done
 
   # Stock backups
   SHA1=
   for name in boot dtb dtbo dtbs; do
-    BACKUP=$MAGISKBIN/stock_${name}.img
+    BACKUP=$SUPERSUBIN/stock_${name}.img
     [ -f $BACKUP ] || continue
     if [ $name = 'boot' ]; then
-      SHA1=$($MAGISKBIN/magiskboot sha1 $BACKUP)
-      mkdir /data/magisk_backup_${SHA1} 2>/dev/null
+      SHA1=$($SUPERSUBIN/supersuboot sha1 $BACKUP)
+      mkdir /data/supersu_backup_${SHA1} 2>/dev/null
     fi
     [ -z $SHA1 ] && break
-    TARGET=/data/magisk_backup_${SHA1}/${name}.img
+    TARGET=/data/supersu_backup_${SHA1}/${name}.img
     cp $BACKUP $TARGET
     rm -f $BACKUP
     gzip -9f $TARGET
@@ -579,7 +579,7 @@ run_migrations() {
 }
 
 copy_preinit_files() {
-  local PREINITDIR=$MAGISKTMP/.magisk/preinit
+  local PREINITDIR=$SUPERSUTMP/.supersu/preinit
   if [ ! -d $PREINITDIR ]; then
     ui_print "- Unable to find preinit dir"
     return 1
@@ -661,7 +661,7 @@ install_module() {
 
   # Extract prop file
   unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
-  [ ! -f $TMPDIR/module.prop ] && abort "! This zip is not a Magisk module!"
+  [ ! -f $TMPDIR/module.prop ] && abort "! This zip is not a SuperSU module!"
 
   local MODDIRNAME=modules
   $BOOTMODE && MODDIRNAME=modules_update
@@ -697,7 +697,7 @@ install_module() {
     set_permissions
   else
     print_title "$MODNAME" "by $MODAUTH"
-    print_title "Powered by Magisk"
+    print_title "Powered by SuperSU"
 
     unzip -o "$ZIPFILE" customize.sh -d $MODPATH >&2
 
@@ -724,7 +724,7 @@ install_module() {
   done
 
   if $BOOTMODE; then
-    # Update info for Magisk app
+    # Update info for SuperSU app
     mktouch /data/adb/modules/$MODID/update
     rm -rf /data/adb/modules/$MODID/remove 2>/dev/null
     rm -rf /data/adb/modules/$MODID/disable 2>/dev/null
@@ -760,4 +760,4 @@ install_module() {
 [ -z $BOOTMODE ] && BOOTMODE=false
 
 TMPDIR=/dev/tmp
-MAGISKBIN="/data/adb/magisk"
+SUPERSUBIN="/data/adb/supersu"

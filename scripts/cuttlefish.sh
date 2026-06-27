@@ -4,12 +4,12 @@ set -xe
 . scripts/test_common.sh
 
 cvd_args="-daemon -enable_sandbox=false -memory_mb=8192 -report_anonymous_usage_stats=n -cpus=$core_count"
-magisk_args='-init_boot_image=magisk_patched.img'
+supersu_args='-init_boot_image=supersu_patched.img'
 
 cleanup() {
   print_error "! An error occurred"
   run_cvd_bin stop_cvd || true
-  rm -f magisk_patched.img*
+  rm -f supersu_patched.img*
 }
 
 run_cvd_bin() {
@@ -19,7 +19,7 @@ run_cvd_bin() {
 }
 
 setup_env() {
-  curl -LO https://github.com/topjohnwu/magisk-files/releases/download/files/cuttlefish-base_1.2.0_amd64.deb
+  curl -LO https://github.com/topjohnwu/supersu-files/releases/download/files/cuttlefish-base_1.2.0_amd64.deb
   sudo apt-get update
   sudo dpkg -i ./cuttlefish-base_*_*64.deb || sudo apt-get install -f
   rm cuttlefish-base_*_*64.deb
@@ -63,7 +63,7 @@ test_cf() {
   run_cvd_bin stop_cvd || true
 
   print_title "* Testing $variant builds"
-  timeout $boot_timeout bash -c "run_cvd_bin launch_cvd $cvd_args $magisk_args -resume=false"
+  timeout $boot_timeout bash -c "run_cvd_bin launch_cvd $cvd_args $supersu_args -resume=false"
   adb wait-for-device
   run_setup $variant
 
@@ -71,7 +71,7 @@ test_cf() {
   sleep 5
   run_cvd_bin stop_cvd || true
 
-  timeout $boot_timeout bash -c "run_cvd_bin launch_cvd $cvd_args $magisk_args"
+  timeout $boot_timeout bash -c "run_cvd_bin launch_cvd $cvd_args $supersu_args"
   adb wait-for-device
   run_tests
 }
@@ -82,16 +82,16 @@ test_main() {
   adb wait-for-device
 
   # Patch and test debug build
-  ./build.py -v avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
+  ./build.py -v avd_patch "$CF_HOME/init_boot.img" supersu_patched.img
   test_cf debug
 
   # Patch and test release build
-  ./build.py -vr avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
+  ./build.py -vr avd_patch "$CF_HOME/init_boot.img" supersu_patched.img
   test_cf release
 
   # Cleanup
   run_cvd_bin stop_cvd || true
-  rm -f magisk_patched.img*
+  rm -f supersu_patched.img*
 }
 
 if [ -z $CF_HOME ]; then
