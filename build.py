@@ -398,7 +398,7 @@ def build_apk(module: str):
 
     os.chdir("app")
     build_type = "Release" if args.release else "Debug"
-        proc = execv(
+    proc = execv(
         [
             gradlew,
             f"{module}:assemble{build_type}",
@@ -412,6 +412,7 @@ def build_apk(module: str):
     os.chdir("..")
     if proc.returncode != 0:
         error(f"Build {module} failed!")
+        
 
     build_type = build_type.lower()
 
