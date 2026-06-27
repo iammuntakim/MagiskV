@@ -398,12 +398,14 @@ def build_apk(module: str):
 
     os.chdir("app")
     build_type = "Release" if args.release else "Debug"
-    proc = execv(
+        proc = execv(
         [
             gradlew,
             f"{module}:assemble{build_type}",
             f"-PconfigPath={props}",
             f"-PabiList={','.join(build_abis.keys())}",
+            "--stacktrace",
+            "--info",
         ],
         env=env,
     )

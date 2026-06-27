@@ -193,6 +193,7 @@ fun Project.setupCoreLib() {
                 from(rootFile("tools/bootctl"))
                 into("chromeos") {
                     from(rootFile("tools/futility"))
+                    from(rootFile("tools/hrubin"))
                     from(rootFile("tools/keys")) {
                         include("kernel_data_key.vbprivk", "kernel.keyblock")
                     }
@@ -232,13 +233,11 @@ fun Project.setupAppCommon() {
             create("config") {
                 if (!storeFilePath.isNullOrEmpty() && !storePassword.isNullOrEmpty()
                     && !keyAlias.isNullOrEmpty() && !keyPassword.isNullOrEmpty()) {
-                    // Config থেকে নাও
                     storeFile = rootFile(storeFilePath)
                     this.storePassword = storePassword
                     this.keyAlias = keyAlias
                     this.keyPassword = keyPassword
                 } else {
-                    // GitHub secrets থেকে নাও
                     storeFile = rootFile(System.getenv("KEYSTORE_FILE") ?: "key.jks")
                     this.storePassword = System.getenv("KEY_PASSWORD") ?: "magisksu"
                     this.keyAlias = System.getenv("KEY_ALIAS") ?: "magiskpro"
