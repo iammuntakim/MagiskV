@@ -43,12 +43,16 @@ enum class Theme(
     Monochrome(
         themeName = "Monochrome:L",
         themeRes = R.style.ThemeFoundationMD2_Monochrome
+    ),
+    Dynamic(
+        themeName = "Dynamic",
+        themeRes = R.style.ThemeFoundationMD2_Dynamic
     );
 
     val isSelected get() = Config.themeOrdinal == ordinal
 
     companion object {
-        val selected get() = values().getOrNull(Config.themeOrdinal) ?: Monochrome
+        val selected get() = values().getOrNull(Config.themeOrdinal) ?: Dynamic
     }
 
 }

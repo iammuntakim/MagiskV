@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--1st party themes-->
-
     <style name="ThemeFoundationMD2.Piplup">
         <item name="colorPrimary">#4EAFF5</item>
         <item name="colorPrimaryVariant">#804EAFF5</item>
@@ -42,35 +40,32 @@
         <item name="colorOnPrimary">#000000</item>
         <item name="colorOnPrimaryVariant">#D9222222</item>
     </style>
-
-    <!--3rd party themes-->
     
     <style name="ThemeFoundationMD2.Monochrome" parent="ThemeFoundationMD2.Piplup">
         <item name="colorPrimary">#E0E0E0</item>
         <item name="colorPrimaryVariant">#80E0E0E0</item>
-
         <item name="colorSecondary">#A6A6A6</item>
         <item name="colorSecondaryVariant">#80A6A6A6</item>
-
         <item name="colorSurface">#121212</item>
         <item name="colorSurfaceVariant">#1E1E1E</item>
         <item name="colorSurfaceSurfaceVariant">?colorSurface</item>
-
         <item name="colorOnPrimary">#000000</item>
         <item name="colorOnPrimaryVariant">#D9000000</item>
-
         <item name="colorOnSecondary">#000000</item>
-
         <item name="colorOnBackground">?colorOnSurface</item>
-
         <item name="colorError">#CF6679</item>
         <item name="colorOnError">#000000</item>
-
         <item name="colorOnSurface">#F2F2F2</item>
         <item name="colorOnSurfaceVariant">#B3F2F2F2</item>
-
         <item name="colorDisabled">#666666</item>
         <item name="colorDisabledVariant">#4D666666</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Dynamic" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">@android:color/system_accent1_600</item>
+        <item name="colorPrimaryVariant">@android:color/system_accent1_700</item>
+        <item name="colorSecondary">@android:color/system_accent1_800</item>
+        <item name="colorSecondaryVariant">@android:color/system_accent1_900</item>
     </style>
 
 </resources>

@@ -8,8 +8,12 @@
     android:viewportHeight="960">
 
     <group
+        android:pivotX="480"
+        android:pivotY="480"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
         android:translateX="0"
-        android:translateY="-30">
+        android:translateY="-10">
 
         <path android:pathData="M160,720 Q40,720 42,640 Q50,560 110,480 Q170,400 260,375 L180,245 Q168,225 186,210 Q202,192 222,202 Q242,212 254,230 L330,344 Q402,320 480,320 Q558,320 630,344 L706,230 Q718,212 738,202 Q758,192 774,210 Q792,225 780,245 L690,375 Q790,400 850,480 Q910,560 918,640 Q920,720 800,720 Z">
             <aapt:attr name="android:fillColor">
