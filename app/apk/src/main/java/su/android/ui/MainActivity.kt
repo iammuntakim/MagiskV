@@ -96,7 +96,7 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
             isRootFragment = when (destination.id) {
                 R.id.homeFragment,
                 R.id.modulesFragment,
-                R.id.superuserFragment,
+                R.id.superuserFragment -> true
                 else -> false
             }
 
