@@ -76,7 +76,7 @@ abi_alias = {
     "x64": "x86_64",
 }
 default_abis = support_abis.keys() - {"riscv64"}
-support_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy", "resetprop"}
+support_targets = {"supersu", "supersuinit", "supersuboot", "supersupolicy", "resetprop"}
 default_targets = support_targets - {"resetprop"}
 rust_targets = default_targets.copy()
 clean_targets = {"native", "cpp", "rust", "app"}
@@ -167,8 +167,8 @@ def clean_elf():
     elif args.verbose > 1:
         cmds.append("--verbose")
     cmds.append("--")
-    cmds.extend(glob.glob("native/out/*/magisk"))
-    cmds.extend(glob.glob("native/out/*/magiskpolicy"))
+    cmds.extend(glob.glob("native/out/*/supersu"))
+    cmds.extend(glob.glob("native/out/*/supersupolicy"))
     run_cargo(cmds)
 
 
@@ -190,7 +190,7 @@ def run_ndk_build(cmds: list[str]):
     if args.verbose > 1:
         cmds.append("V=1")
     if not args.release:
-        cmds.append("MAGISK_DEBUG=1")
+        cmds.append("SUPERSU_DEBUG=1")
     proc = execv([ndk_build, *cmds])
     if proc.returncode != 0:
         error("Build binary failed!")
@@ -201,15 +201,15 @@ def build_cpp_src(targets: set[str]):
     cmds = []
     clean = False
 
-    if "magisk" in targets:
-        cmds.append("B_MAGISK=1")
+    if "supersu" in targets:
+        cmds.append("B_SUPERSU=1")
         clean = True
 
-    if "magiskpolicy" in targets:
+    if "supersupolicy" in targets:
         cmds.append("B_POLICY=1")
         clean = True
 
-    if "magiskinit" in targets:
+    if "supersuinit" in targets:
         cmds.append("B_PRELOAD=1")
 
     if "resetprop" in targets:
@@ -221,10 +221,10 @@ def build_cpp_src(targets: set[str]):
 
     cmds.clear()
 
-    if "magiskinit" in targets:
+    if "supersuinit" in targets:
         cmds.append("B_INIT=1")
 
-    if "magiskboot" in targets:
+    if "supersuboot" in targets:
         cmds.append("B_BOOT=1")
 
     if cmds:
@@ -254,7 +254,7 @@ def run_cargo(cmds: list[str]):
 def build_rust_src(targets: set[str]):
     targets = targets.copy()
     if "resetprop" in targets:
-        targets.add("magisk")
+        targets.add("supersu")
     targets = targets & rust_targets
     if not targets:
         return
@@ -309,16 +309,16 @@ def write_if_diff(file_name: Path, text: str):
 
 def dump_flag_header():
     flag_txt = "#pragma once\n"
-    flag_txt += f'#define MAGISK_VERSION      "{config["version"]}"\n'
-    flag_txt += f'#define MAGISK_VER_CODE     {config["versionCode"]}\n'
-    flag_txt += f"#define MAGISK_DEBUG        {0 if args.release else 1}\n"
+    flag_txt += f'#define SUPERSU_VERSION      "{config["version"]}"\n'
+    flag_txt += f'#define SUPERSU_VER_CODE     {config["versionCode"]}\n'
+    flag_txt += f"#define SUPERSU_DEBUG        {0 if args.release else 1}\n"
 
     native_gen_path = Path("native", "out", "generated")
     native_gen_path.mkdir(mode=0o755, parents=True, exist_ok=True)
     write_if_diff(native_gen_path / "flags.h", flag_txt)
 
-    rust_flag_txt = f'pub const MAGISK_VERSION: &str = "{config["version"]}";\n'
-    rust_flag_txt += f'pub const MAGISK_VER_CODE: i32 = {config["versionCode"]};\n'
+    rust_flag_txt = f'pub const SUPERSU_VERSION: &str = "{config["version"]}";\n'
+    rust_flag_txt += f'pub const SUPERSU_VER_CODE: i32 = {config["versionCode"]};\n'
     write_if_diff(native_gen_path / "flags.rs", rust_flag_txt)
 
 
@@ -426,7 +426,7 @@ def build_apk(module: str):
 
 
 def build_app():
-    header("* Building the Magisk app")
+    header("* Building the SuperSU app")
     apk = build_apk(":apk")
 
     build_type = "release" if args.release else "debug"
@@ -531,7 +531,7 @@ def gen_ide():
     rm_rf(Path("native", "compile_commands.json"))
     run_ndk_build(
         [
-            "B_MAGISK=1",
+            "B_SUPERSU=1",
             "B_INIT=1",
             "B_BOOT=1",
             "B_POLICY=1",
@@ -659,7 +659,7 @@ def push_files(script: Path):
     finally:
         rm_rf(busybox)
 
-    proc = execv([adb_path, "push", apk, "/data/local/tmp/magisk.apk"])
+    proc = execv([adb_path, "push", apk, "/data/local/tmp/supersu.apk"])
     if proc.returncode != 0:
         error("adb push failed!")
 
@@ -687,7 +687,7 @@ def patch_avd_file():
         error("adb push failed!")
 
     src_file = f"/data/local/tmp/{input.name}"
-    out_file = f"{src_file}.magisk"
+    out_file = f"{src_file}.supersu"
 
     proc = execv([adb_path, "shell", "sh", "/data/local/tmp/host_patch.sh", src_file])
     if proc.returncode != 0:
@@ -722,7 +722,7 @@ def ensure_paths():
             error("Please set Android SDK path to environment variable ANDROID_HOME")
 
     ndk_root = sdk_path / "ndk"
-    ndk_path = ndk_root / "magisk"
+    ndk_path = ndk_root / "supersu"
     ndk_build = ndk_path / "ndk-build"
     rust_sysroot = ndk_path / "toolchains" / "rust"
     adb_path = sdk_path / "platform-tools" / "adb"
@@ -781,7 +781,7 @@ def load_config():
     gradle_props = Path("app", "gradle.properties")
     if gradle_props.exists():
         for key, value in parse_props(gradle_props).items():
-            if key.startswith("magisk."):
+            if key.startswith("supersu."):
                 config[key[7:]] = value
 
     try:
@@ -801,7 +801,7 @@ def load_config():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Magisk build script")
+    parser = argparse.ArgumentParser(description="SuperSU build script")
     parser.set_defaults(func=lambda x: None)
     parser.add_argument(
         "-r", "--release", action="store_true", help="compile in release mode"
@@ -827,7 +827,7 @@ def parse_args():
         or empty for defaults ({', '.join(default_targets)})",
     )
 
-    app_parser = subparsers.add_parser("app", help="build the Magisk app")
+    app_parser = subparsers.add_parser("app", help="build the SuperSU app")
 
     stub_parser = subparsers.add_parser("stub", help="build the stub app")
 
@@ -838,10 +838,10 @@ def parse_args():
         "targets", nargs="*", help="native, cpp, rust, java, or empty to clean all"
     )
 
-    ndk_parser = subparsers.add_parser("ndk", help="setup Magisk NDK")
+    ndk_parser = subparsers.add_parser("ndk", help="setup SuperSU NDK")
 
     emu_parser = subparsers.add_parser("emulator", help="setup AVD for development")
-    emu_parser.add_argument("apk", help="a Magisk APK to use", nargs="?")
+    emu_parser.add_argument("apk", help="a SuperSU APK to use", nargs="?")
     emu_parser.add_argument(
         "-b", "--build", action="store_true", help="build before patching"
     )
@@ -851,7 +851,7 @@ def parse_args():
     )
     avd_patch_parser.add_argument("image", help="path to ramdisk.img or init_boot.img")
     avd_patch_parser.add_argument("output", help="output file name")
-    avd_patch_parser.add_argument("--apk", help="a Magisk APK to use")
+    avd_patch_parser.add_argument("--apk", help="a SuperSU APK to use")
     avd_patch_parser.add_argument(
         "-b", "--build", action="store_true", help="build before patching"
     )
