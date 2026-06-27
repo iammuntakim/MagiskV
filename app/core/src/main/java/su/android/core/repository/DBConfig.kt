@@ -1,7 +1,7 @@
 package su.android.core.repository
 
-import su.android.core.data.magiskdb.SettingsDao
-import su.android.core.data.magiskdb.StringDao
+import su.android.core.data.supersudb.SettingsDao
+import su.android.core.data.supersudb.StringDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

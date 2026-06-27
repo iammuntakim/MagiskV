@@ -1,4 +1,4 @@
-use crate::daemon::MagiskD;
+use crate::daemon::SuperSUD;
 use crate::consts::DEFAULT_ADDR;
 use base::{debug, error, info, warn};
 
@@ -8,7 +8,7 @@ use std::process::Command;
 use std::sync::atomic::Ordering;
 use std::time::Duration;
 
-pub fn start_v_api_if_enabled(daemon: &MagiskD) {
+pub fn start_v_api_if_enabled(daemon: &SuperSUD) {
     if daemon.v_api_started.swap(true, Ordering::AcqRel) {
         return;
     }

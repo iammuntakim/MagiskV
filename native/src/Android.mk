@@ -4,15 +4,15 @@ LOCAL_PATH := $(call my-dir)
 # Binaries
 ########################
 
-ifdef B_MAGISK
+ifdef B_SUPERSU
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magisk
+LOCAL_MODULE := supersu
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libsystemproperties \
     liblsplt \
-    libmagisk-rs
+    libsupersu-rs
 
 LOCAL_SRC_FILES := \
     core/applets.cpp \
@@ -49,7 +49,7 @@ endif
 ifdef B_INIT
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magiskinit
+LOCAL_MODULE := supersuinit
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libpolicy \
@@ -76,7 +76,7 @@ endif
 ifdef B_BOOT
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magiskboot
+LOCAL_MODULE := supersuboot
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     liblz4 \
@@ -100,7 +100,7 @@ endif
 ifdef B_POLICY
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magiskpolicy
+LOCAL_MODULE := supersupolicy
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libpolicy \
@@ -117,7 +117,7 @@ LOCAL_MODULE := resetprop
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libsystemproperties \
-    libmagisk-rs
+    libsupersu-rs
 
 LOCAL_SRC_FILES := \
     core/applet_stub.cpp \

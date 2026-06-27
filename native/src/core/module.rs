@@ -1,6 +1,6 @@
 use crate::consts::{MODULEMNT, MODULEROOT, MODULEUPGRADE, WORKERDIR};
-use crate::daemon::MagiskD;
-use crate::ffi::{ModuleInfo, exec_module_scripts, exec_script, get_magisk_tmp};
+use crate::daemon::SuperSUD;
+use crate::ffi::{ModuleInfo, exec_module_scripts, exec_script, get_supersu_tmp};
 use crate::mount::setup_module_mount;
 use crate::resetprop::load_prop_file;
 use base::{
@@ -17,7 +17,7 @@ use std::path::{Component, Path};
 use std::ptr;
 use std::sync::atomic::Ordering;
 
-const MAGISK_BIN_INJECT_PARTITIONS: [&Utf8CStr; 4] = [
+const SUPERSU_BIN_INJECT_PARTITIONS: [&Utf8CStr; 4] = [
     cstr!("/system/"),
     cstr!("/vendor/"),
     cstr!("/product/"),
@@ -114,7 +114,7 @@ impl ModulePaths<'_> {
         real.append_path("/");
         module.append_path(MODULEROOT);
         module_mnt
-            .append_path(get_magisk_tmp())
+            .append_path(get_supersu_tmp())
             .append_path(MODULEMNT);
         ModulePaths {
             real: PathTracker::from(real),
@@ -149,7 +149,7 @@ impl ModulePaths<'_> {
         self.module.path
     }
 
-    // Returns "$MAGISK_TMP/.magisk/modules/{module}/system/bin"
+    // Returns "$SUPERSU_TMP/.supersu/modules/{module}/system/bin"
     fn module_mnt(&self) -> &Utf8CStr {
         self.module_mnt.path
     }
@@ -164,7 +164,7 @@ struct MountPaths<'a> {
 impl MountPaths<'_> {
     fn new<'a>(real: &'a mut dyn Utf8CStrBuf, worker: &'a mut dyn Utf8CStrBuf) -> MountPaths<'a> {
         real.append_path("/");
-        worker.append_path(get_magisk_tmp()).append_path(WORKERDIR);
+        worker.append_path(get_supersu_tmp()).append_path(WORKERDIR);
         MountPaths {
             real: PathTracker::from(real),
             worker: PathTracker::from(worker),
@@ -190,7 +190,7 @@ impl MountPaths<'_> {
         self.real.path
     }
 
-    // Returns "$MAGISK_TMP/.magisk/worker/system/bin"
+    // Returns "$SUPERSU_TMP/.supersu/worker/system/bin"
     fn worker(&self) -> &Utf8CStr {
         self.worker.path
     }
@@ -200,7 +200,7 @@ enum FsNode {
     Directory { children: FsNodeMap },
     File { src: Utf8CString },
     Symlink { target: Utf8CString },
-    MagiskLink,
+    SuperSULink,
     Whiteout,
 }
 
@@ -413,15 +413,15 @@ impl FsNode {
                     clone_attr(path.real(), path.worker())?;
                 }
             }
-            FsNode::MagiskLink => {
+            FsNode::SuperSULink => {
                 if let Some(name) = path.real().file_name()
                     && name == "supolicy"
                 {
-                    module_log!("mklink", path.worker(), "./magiskpolicy");
-                    path.worker().create_symlink_to(cstr!("./magiskpolicy"))?;
+                    module_log!("mklink", path.worker(), "./supersupolicy");
+                    path.worker().create_symlink_to(cstr!("./supersupolicy"))?;
                 } else {
-                    module_log!("mklink", path.worker(), "./magisk");
-                    path.worker().create_symlink_to(cstr!("./magisk"))?;
+                    module_log!("mklink", path.worker(), "./supersu");
+                    path.worker().create_symlink_to(cstr!("./supersu"))?;
                 }
             }
             FsNode::Whiteout => {
@@ -438,34 +438,34 @@ fn get_path_env() -> String {
         .unwrap_or_default()
 }
 
-fn inject_magisk_bins(system: &mut FsNode, is_emulator: bool) {
+fn inject_supersu_bins(system: &mut FsNode, is_emulator: bool) {
     fn inject(children: &mut FsNodeMap) {
-        let mut path = cstr::buf::default().join_path(get_magisk_tmp());
+        let mut path = cstr::buf::default().join_path(get_supersu_tmp());
 
         // Inject binaries
 
         let len = path.len();
-        path.append_path("magisk");
+        path.append_path("supersu");
         children.insert(
-            "magisk".to_string(),
+            "supersu".to_string(),
             FsNode::File {
                 src: path.to_owned(),
             },
         );
 
         path.truncate(len);
-        path.append_path("magiskpolicy");
+        path.append_path("supersupolicy");
         children.insert(
-            "magiskpolicy".to_string(),
+            "supersupolicy".to_string(),
             FsNode::File {
                 src: path.to_owned(),
             },
         );
 
         // Inject applet symlinks
-        children.insert("su".to_string(), FsNode::MagiskLink);
-        children.insert("resetprop".to_string(), FsNode::MagiskLink);
-        children.insert("supolicy".to_string(), FsNode::MagiskLink);
+        children.insert("su".to_string(), FsNode::SuperSULink);
+        children.insert("resetprop".to_string(), FsNode::SuperSULink);
+        children.insert("supolicy".to_string(), FsNode::SuperSULink);
     }
 
     // Strip /system prefix to insert correct node
@@ -481,7 +481,7 @@ fn inject_magisk_bins(system: &mut FsNode, is_emulator: bool) {
 
     for orig_item in path_env.split(':') {
         // Filter non-suitable paths
-        if !MAGISK_BIN_INJECT_PARTITIONS
+        if !SUPERSU_BIN_INJECT_PARTITIONS
             .iter()
             .any(|p| orig_item.starts_with(p.as_str()))
         {
@@ -576,19 +576,19 @@ fn inject_zygisk_bins(name: &str, system: &mut FsNode) {
             .children()
             .map(|c| c.entry("lib".to_string()).or_insert_with(FsNode::new_dir));
         if let Some(FsNode::Directory { children }) = lib {
-            let mut bin_path = cstr::buf::default().join_path(get_magisk_tmp());
+            let mut bin_path = cstr::buf::default().join_path(get_supersu_tmp());
 
             #[cfg(target_pointer_width = "64")]
-            bin_path.append_path("magisk32");
+            bin_path.append_path("supersu32");
 
             #[cfg(target_pointer_width = "32")]
-            bin_path.append_path("magisk");
+            bin_path.append_path("supersu");
 
             // There are some devices that announce ABI as 64 bit only, but ship with linker
             // because they make use of a special 32 bit to 64 bit translator (such as tango).
-            // In this case, magisk32 does not exist, so inserting it will cause bind mount
+            // In this case, supersu32 does not exist, so inserting it will cause bind mount
             // failure and affect module mount. Native bridge injection does not support these
-            // kind of translators anyway, so simply check if magisk32 exists here.
+            // kind of translators anyway, so simply check if supersu32 exists here.
             if bin_path.exists() {
                 children.insert(
                     name.to_string(),
@@ -607,8 +607,8 @@ fn inject_zygisk_bins(name: &str, system: &mut FsNode) {
             .map(|c| c.entry("lib64".to_string()).or_insert_with(FsNode::new_dir));
         if let Some(FsNode::Directory { children }) = lib64 {
             let bin_path = cstr::buf::default()
-                .join_path(get_magisk_tmp())
-                .join_path("magisk");
+                .join_path(get_supersu_tmp())
+                .join_path("supersu");
 
             children.insert(
                 name.to_string(),
@@ -819,7 +819,7 @@ fn collect_modules(zygisk_enabled: bool, open_zygisk: bool) -> Vec<ModuleInfo> {
     modules
 }
 
-impl MagiskD {
+impl SuperSUD {
     pub fn handle_modules(&self) {
         setup_module_mount();
         upgrade_modules().ok();
@@ -877,14 +877,14 @@ impl MagiskD {
 
         // Step 2: Inject custom files
         //
-        // Magisk provides some built-in functionality that requires augmenting the filesystem.
+        // SuperSU provides some built-in functionality that requires augmenting the filesystem.
         // We expose several cmdline tools (e.g. su) into PATH, and the zygisk shared library
         // has to also be added into the default LD_LIBRARY_PATH for code injection.
         // We directly inject file nodes into the virtual filesystem tree we built in the previous
-        // step, treating Magisk just like a special "module".
+        // step, treating SuperSU just like a special "module".
 
-        if get_magisk_tmp() != "/sbin" || get_path_env().split(":").all(|s| s != "/sbin") {
-            inject_magisk_bins(&mut system, self.is_emulator);
+        if get_supersu_tmp() != "/sbin" || get_path_env().split(":").all(|s| s != "/sbin") {
+            inject_supersu_bins(&mut system, self.is_emulator);
         }
 
         // Handle zygisk
@@ -897,7 +897,7 @@ impl MagiskD {
         // Step 3: Extract all supported read-only partition roots
         //
         // For simplicity and backwards compatibility on older Android versions, when constructing
-        // Magisk modules, we always assume that there is only a single read-only partition mounted
+        // SuperSU modules, we always assume that there is only a single read-only partition mounted
         // at /system. However, on modern Android there are actually multiple read-only partitions
         // mounted at their respective paths. We need to extract these subtrees out of the main
         // tree and treat them as individual trees.

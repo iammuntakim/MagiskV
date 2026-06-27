@@ -1,5 +1,5 @@
 use crate::consts::{ROOTMNT, ROOTOVL};
-use crate::ffi::MagiskInit;
+use crate::ffi::SuperSUInit;
 use base::nix::fcntl::OFlag;
 use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
@@ -10,8 +10,8 @@ use std::io::{BufReader, Write};
 use std::mem;
 use std::os::fd::{FromRawFd, RawFd};
 
-pub fn inject_magisk_rc(fd: RawFd, tmp_dir: &Utf8CStr) {
-    debug!("Injecting magisk rc");
+pub fn inject_supersu_rc(fd: RawFd, tmp_dir: &Utf8CStr) {
+    debug!("Injecting supersu rc");
 
     let mut file = unsafe { File::from_raw_fd(fd) };
 
@@ -19,18 +19,18 @@ pub fn inject_magisk_rc(fd: RawFd, tmp_dir: &Utf8CStr) {
         file,
         r#"
 on post-fs-data
-    exec {0} 0 0 -- {1}/magisk --post-fs-data
+    exec {0} 0 0 -- {1}/supersu --post-fs-data
 
 on property:vold.decrypt=trigger_restart_framework
-    exec {0} 0 0 -- {1}/magisk --service
+    exec {0} 0 0 -- {1}/supersu --service
 
 on nonencrypted
-    exec {0} 0 0 -- {1}/magisk --service
+    exec {0} 0 0 -- {1}/supersu --service
 
 on property:sys.boot_completed=1
-    exec {0} 0 0 -- {1}/magisk --boot-complete
+    exec {0} 0 0 -- {1}/supersu --boot-complete
 "#,
-        "u:r:magisk:s0", tmp_dir
+        "u:r:supersu:s0", tmp_dir
     )
     .ok();
 
@@ -39,9 +39,9 @@ on property:sys.boot_completed=1
 
 pub struct OverlayAttr(Utf8CString, Utf8CString);
 
-impl MagiskInit {
+impl SuperSUInit {
     pub(crate) fn parse_config_file(&mut self) {
-        if let Ok(fd) = cstr!("/data/.backup/.magisk").open(OFlag::O_RDONLY) {
+        if let Ok(fd) = cstr!("/data/.backup/.supersu").open(OFlag::O_RDONLY) {
             let mut reader = BufReader::new(fd);
             reader.for_each_prop(|key, val| {
                 if key == "PREINITDEVICE" {

@@ -7,9 +7,9 @@ import androidx.room.Room
 import su.android.core.AppContext
 import su.android.core.Const
 import su.android.core.data.SuLogDatabase
-import su.android.core.data.magiskdb.PolicyDao
-import su.android.core.data.magiskdb.SettingsDao
-import su.android.core.data.magiskdb.StringDao
+import su.android.core.data.supersudb.PolicyDao
+import su.android.core.data.supersudb.SettingsDao
+import su.android.core.data.supersudb.StringDao
 import su.android.core.ktx.deviceProtectedContext
 import su.android.core.repository.LogRepository
 import su.android.core.repository.NetworkService

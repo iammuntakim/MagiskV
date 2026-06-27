@@ -22,7 +22,7 @@ struct devinfo {
 static vector<devinfo> dev_list;
 
 // When this boolean is set, this means we are currently
-// running magiskinit on legacy SAR AVD emulator
+// running supersuinit on legacy SAR AVD emulator
 bool avd_hack = false;
 
 static void parse_device(devinfo *dev, const char *uevent) {
@@ -44,7 +44,7 @@ static void parse_device(devinfo *dev, const char *uevent) {
     });
 }
 
-void MagiskInit::collect_devices() const noexcept {
+void SuperSUInit::collect_devices() const noexcept {
     char path[PATH_MAX];
     devinfo dev{};
     if (auto dir = xopen_dir("/sys/dev/block"); dir) {
@@ -71,7 +71,7 @@ void MagiskInit::collect_devices() const noexcept {
     }
 }
 
-uint64_t MagiskInit::find_block(const char *partname) const noexcept {
+uint64_t SuperSUInit::find_block(const char *partname) const noexcept {
     if (dev_list.empty())
         collect_devices();
 
@@ -102,7 +102,7 @@ uint64_t MagiskInit::find_block(const char *partname) const noexcept {
     return 0;
 }
 
-void MagiskInit::mount_preinit_dir() noexcept {
+void SuperSUInit::mount_preinit_dir() noexcept {
     if (preinit_dev.empty()) return;
     auto dev = find_block(preinit_dev.c_str());
     if (dev == 0) {
@@ -122,7 +122,7 @@ void MagiskInit::mount_preinit_dir() noexcept {
 
     // Since we are mounting the block device directly, make sure to ONLY mount the partitions
     // as read-only, or else the kernel might crash due to crappy drivers.
-    // After the device boots up, magiskd will properly symlink the correct path at PREINITMIRR as writable.
+    // After the device boots up, supersud will properly symlink the correct path at PREINITMIRR as writable.
     if (mounted || mount(PREINITDEV, MIRRDIR, "ext4", MS_RDONLY, nullptr) == 0 ||
         mount(PREINITDEV, MIRRDIR, "f2fs", MS_RDONLY, nullptr) == 0) {
         string preinit_dir = resolve_preinit_dir(MIRRDIR);
@@ -142,7 +142,7 @@ void MagiskInit::mount_preinit_dir() noexcept {
     }
 }
 
-bool MagiskInit::mount_system_root() noexcept {
+bool SuperSUInit::mount_system_root() noexcept {
     LOGD("Mounting system_root\n");
 
     // there's no /dev in stub cpio
@@ -196,7 +196,7 @@ mount_root:
     LOGD("is_two_stage: [%d]\n", is_two_stage);
 
     // For API 28 AVD, it uses legacy SAR setup that requires
-    // special hacks in magiskinit to work properly.
+    // special hacks in supersuinit to work properly.
     if (!is_two_stage && config.emulator) {
         avd_hack = true;
         // These values are hardcoded for API 28 AVD
@@ -209,8 +209,8 @@ mount_root:
     return is_two_stage;
 }
 
-void MagiskInit::setup_tmp(const char *path) noexcept {
-    LOGD("Setup Magisk tmp at %s\n", path);
+void SuperSUInit::setup_tmp(const char *path) noexcept {
+    LOGD("Setup SuperSU tmp at %s\n", path);
     chdir("/data");
 
     xmkdir(INTLROOT, 0711);
@@ -219,20 +219,20 @@ void MagiskInit::setup_tmp(const char *path) noexcept {
 
     mount_preinit_dir();
 
-    cp_afc(".backup/.magisk", MAIN_CONFIG);
+    cp_afc(".backup/.supersu", MAIN_CONFIG);
     rm_rf(".backup");
 
     // Create applet symlinks
     for (int i = 0; applet_names[i]; ++i)
-        xsymlink("./magisk", applet_names[i]);
-    xsymlink("./magiskpolicy", "supolicy");
+        xsymlink("./supersu", applet_names[i]);
+    xsymlink("./supersupolicy", "supolicy");
 
     xmount(".", path, nullptr, MS_BIND, nullptr);
 
     chdir(path);
 
     // Prepare worker
-    xmount("magisk", WORKERDIR, "tmpfs", 0, "mode=755");
+    xmount("supersu", WORKERDIR, "tmpfs", 0, "mode=755");
 
     // Use isolated devpts if kernel support
     if (access("/dev/pts/ptmx", F_OK) == 0) {

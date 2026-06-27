@@ -28,8 +28,8 @@ private interface CertKeyProvider {
 class Keygen : CertKeyProvider {
 
     companion object {
-        private const val ALIAS = "magisk"
-        private val PASSWORD get() = "magisk".toCharArray()
+        private const val ALIAS = "supersu"
+        private val PASSWORD get() = "supersu".toCharArray()
         private const val DNAME = "C=US,ST=California,L=Mountain View,O=Google Inc.,OU=Android,CN=Android"
         private const val BASE64_FLAG = Base64.NO_PADDING or Base64.NO_WRAP
     }

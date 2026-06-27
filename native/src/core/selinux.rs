@@ -1,5 +1,5 @@
-use crate::consts::{DATABIN, LOG_PIPE, MAGISK_LOG_CON, MAGISKDB, MODULEROOT, SECURE_DIR};
-use crate::ffi::get_magisk_tmp;
+use crate::consts::{DATABIN, LOG_PIPE, SUPERSU_LOG_CON, SUPERSUDB, MODULEROOT, SECURE_DIR};
+use crate::ffi::get_supersu_tmp;
 use base::{Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf, cstr, libc};
 use nix::fcntl::OFlag;
 use std::io::Write;
@@ -69,11 +69,11 @@ pub(crate) fn restorecon() {
     path.clear();
     path.push_str(DATABIN);
     restore_syscon(&mut path).log_ok();
-    unsafe { libc::chmod(cstr!(MAGISKDB).as_ptr(), 0o000) };
+    unsafe { libc::chmod(cstr!(SUPERSUDB).as_ptr(), 0o000) };
 }
 
 pub(crate) fn restore_tmpcon() -> LoggedResult<()> {
-    let tmp = get_magisk_tmp();
+    let tmp = get_supersu_tmp();
     if tmp == "/sbin" {
         tmp.set_secontext(ROOT_CON)?;
     } else {
@@ -91,7 +91,7 @@ pub(crate) fn restore_tmpcon() -> LoggedResult<()> {
 
     path.clear();
     path.append_path(tmp).append_path(LOG_PIPE);
-    path.set_secontext(cstr!(MAGISK_LOG_CON))?;
+    path.set_secontext(cstr!(SUPERSU_LOG_CON))?;
 
     Ok(())
 }

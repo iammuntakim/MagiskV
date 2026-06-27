@@ -87,8 +87,8 @@
             </com.google.android.material.card.MaterialCardView>
 
             <include
-                android:id="@+id/home_magisk_wrapper"
-                layout="@layout/include_home_magisk"
+                android:id="@+id/home_supersu_wrapper"
+                layout="@layout/include_home_supersu"
                 viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
-                app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
+                app:layout_constraintTop_toBottomOf="@+id/home_supersu_wrapper" />
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card"

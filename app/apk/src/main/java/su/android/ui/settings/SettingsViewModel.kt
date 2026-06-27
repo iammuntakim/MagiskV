@@ -57,10 +57,10 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             if (hidden) list.add(Restore) else list.add(Hide)
         }
 
-        // Magisk
+        // SuperSU
         if (Info.env.isActive) {
             list.addAll(listOf(
-                Magisk,
+                SuperSU,
                 SystemlessHosts
             ))
             if (Const.Version.atLeast_24_0()) {

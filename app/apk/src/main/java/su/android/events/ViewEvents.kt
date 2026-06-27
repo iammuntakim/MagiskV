@@ -14,7 +14,7 @@ import su.android.core.base.ContentResultCallback
 import su.android.core.base.relaunch
 import su.android.utils.TextHolder
 import su.android.utils.asText
-import su.android.view.MagiskDialog
+import su.android.view.SuperSUDialog
 import su.android.view.Shortcuts
 
 class PermissionEvent(
@@ -115,10 +115,10 @@ class DialogEvent(
     private val builder: DialogBuilder
 ) : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: UIActivity<*>) {
-        MagiskDialog(activity).apply(builder::build).show()
+        SuperSUDialog(activity).apply(builder::build).show()
     }
 }
 
 interface DialogBuilder {
-    fun build(dialog: MagiskDialog)
+    fun build(dialog: SuperSUDialog)
 }

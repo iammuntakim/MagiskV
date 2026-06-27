@@ -41,7 +41,7 @@ class ShellInit : Shell.Initializer() {
             }
 
             if (shell.isRoot) {
-                add("export MAGISKTMP=\$(magisk --path)")
+                add("export SUPERSUTMP=\$(supersu --path)")
                 // Test if we can properly execute stuff in /data
                 Info.noDataExec = !shell.newJob()
                     .add("$localBB sh -c '$localBB true'").exec().isSuccess
@@ -50,9 +50,9 @@ class ShellInit : Shell.Initializer() {
             if (Info.noDataExec) {
                 // Copy it out of /data to workaround Samsung bullshit
                 add(
-                    "if [ -x \$MAGISKTMP/.magisk/busybox/busybox ]; then",
-                    "  cp -af $localBB \$MAGISKTMP/.magisk/busybox/busybox",
-                    "  exec \$MAGISKTMP/.magisk/busybox/busybox sh",
+                    "if [ -x \$SUPERSUTMP/.supersu/busybox/busybox ]; then",
+                    "  cp -af $localBB \$SUPERSUTMP/.supersu/busybox/busybox",
+                    "  exec \$SUPERSUTMP/.supersu/busybox/busybox sh",
                     "else",
                     "  cp -af $localBB /dev/busybox",
                     "  exec /dev/busybox sh",

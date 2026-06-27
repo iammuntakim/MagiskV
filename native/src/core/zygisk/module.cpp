@@ -412,7 +412,7 @@ void ZygiskContext::app_specialize_pre() {
 
 void ZygiskContext::app_specialize_post() {
     run_modules_post();
-    if (info_flags & +ZygiskStateFlags::ProcessIsMagiskApp) {
+    if (info_flags & +ZygiskStateFlags::ProcessIsSuperSUApp) {
         setenv("ZYGISK_ENABLED", "1", 1);
     }
 
@@ -428,7 +428,7 @@ void ZygiskContext::server_specialize_pre() {
         } else {
             run_modules_pre(module_fds);
 
-            // Find all failed module ids and send it back to magiskd
+            // Find all failed module ids and send it back to supersud
             vector<int> failed_ids;
             for (int i = 0; i < module_fds.size(); ++i) {
                 if (module_fds[i] < 0) {

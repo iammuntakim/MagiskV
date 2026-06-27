@@ -1,5 +1,5 @@
 [package]
-name = "magisk"
+name = "supersu"
 version.workspace = true
 edition.workspace = true
 

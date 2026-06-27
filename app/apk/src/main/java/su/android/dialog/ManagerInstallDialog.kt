@@ -5,7 +5,7 @@ import su.android.core.Info
 import su.android.core.R
 import su.android.core.download.DownloadEngine
 import su.android.core.download.Subject
-import su.android.view.MagiskDialog
+import su.android.view.SuperSUDialog
 import java.io.File
 
 class ManagerInstallDialog : MarkDownDialog() {
@@ -17,15 +17,15 @@ class ManagerInstallDialog : MarkDownDialog() {
         return text
     }
 
-    override fun build(dialog: MagiskDialog) {
+    override fun build(dialog: SuperSUDialog) {
         super.build(dialog)
         dialog.apply {
             setCancelable(true)
-            setButton(MagiskDialog.ButtonType.POSITIVE) {
+            setButton(SuperSUDialog.ButtonType.POSITIVE) {
                 text = R.string.install
                 onClick { DownloadEngine.startWithActivity(activity, Subject.App()) }
             }
-            setButton(MagiskDialog.ButtonType.NEGATIVE) {
+            setButton(SuperSUDialog.ButtonType.NEGATIVE) {
                 text = android.R.string.cancel
             }
         }

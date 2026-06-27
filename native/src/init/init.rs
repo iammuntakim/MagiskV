@@ -1,4 +1,4 @@
-use crate::ffi::{BootConfig, MagiskInit, backup_init, magisk_proxy_main};
+use crate::ffi::{BootConfig, SuperSUInit, backup_init, supersu_proxy_main};
 use crate::logging::setup_klog;
 use crate::mount::is_rootfs;
 use crate::twostage::hexpatch_init_for_second_stage;
@@ -7,7 +7,7 @@ use base::{LibcReturn, LoggedResult, ResultExt, cstr, info, raw_cstr};
 use std::ffi::{CStr, c_char};
 use std::ptr::null;
 
-impl MagiskInit {
+impl SuperSUInit {
     fn new(argv: *mut *mut c_char) -> Self {
         Self {
             preinit_dev: String::new(),
@@ -181,12 +181,12 @@ pub unsafe extern "C" fn main(
 
         let name = basename(*argv);
 
-        if CStr::from_ptr(name) == c"magisk" {
-            return magisk_proxy_main(argc, argv);
+        if CStr::from_ptr(name) == c"supersu" {
+            return supersu_proxy_main(argc, argv);
         }
 
         if getpid() == 1 {
-            MagiskInit::new(argv).start().log_ok();
+            SuperSUInit::new(argv).start().log_ok();
         }
 
         1

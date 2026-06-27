@@ -6,11 +6,11 @@
 
         <variable
             name="item"
-            type="su.android.view.MagiskDialog.DialogItem" />
+            type="su.android.view.SuperSUDialog.DialogItem" />
 
         <variable
             name="listener"
-            type="su.android.view.MagiskDialog.DialogClickListener" />
+            type="su.android.view.SuperSUDialog.DialogClickListener" />
 
     </data>
 

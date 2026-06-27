@@ -661,7 +661,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "magisk"
+name = "supersu"
 version = "0.0.0"
 dependencies = [
  "base",
@@ -679,7 +679,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "magiskboot"
+name = "supersuboot"
 version = "0.0.0"
 dependencies = [
  "base",
@@ -709,18 +709,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "magiskinit"
+name = "supersuinit"
 version = "0.0.0"
 dependencies = [
  "base",
  "cxx",
  "cxx-gen",
- "magiskpolicy",
+ "supersupolicy",
  "num-traits",
 ]
 
 [[package]]
-name = "magiskpolicy"
+name = "supersupolicy"
 version = "0.0.0"
 dependencies = [
  "base",

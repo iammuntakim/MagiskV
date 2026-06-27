@@ -17,7 +17,7 @@ object Const {
     // Paths
     const val MODULE_PATH  = "/data/adb/modules"
     const val TMPDIR = "/dev/tmp"
-    const val MAGISK_LOG = "/cache/magisk.log"
+    const val SUPERSU_LOG = "/cache/supersu.log"
 
     // Misc
     val USER_ID = Process.myUid() / 100000
@@ -40,10 +40,10 @@ object Const {
 
     object Url {
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
-        const val SOURCE_CODE_URL = "https://github.com/mikailamin-master/MagiskV"
+        const val SOURCE_CODE_URL = "https://github.com/mikailamin-master/SuperSUV"
 
         const val GITHUB_API_URL = "https://api.github.com/"
-        const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk-files/"
+        const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/supersu-files/"
         const val INVALID_URL = "https://example.com/"
     }
 
@@ -56,7 +56,7 @@ object Const {
     object Value {
         const val FLASH_ZIP = "flash"
         const val PATCH_FILE = "patch"
-        const val FLASH_MAGISK = "magisk"
+        const val FLASH_SUPERSU = "supersu"
         const val FLASH_INACTIVE_SLOT = "slot"
         const val UNINSTALL = "uninstall"
     }

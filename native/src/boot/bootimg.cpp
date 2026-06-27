@@ -7,7 +7,7 @@
 
 #include "boot-rs.hpp"
 #include "bootimg.hpp"
-#include "magiskboot.hpp"
+#include "supersuboot.hpp"
 
 using namespace std;
 

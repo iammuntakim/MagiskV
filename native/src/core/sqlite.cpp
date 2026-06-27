@@ -182,7 +182,7 @@ sqlite3 *open_and_init_db() {
     {
         sqlite3 *sql;
         // We open the connection with SQLITE_OPEN_NOMUTEX because we are guarding it ourselves
-        sql_chk_log(sqlite3_open_v2, MAGISKDB, &sql,
+        sql_chk_log(sqlite3_open_v2, SUPERSUDB, &sql,
                     SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX, nullptr);
         db.reset(sql);
     }
@@ -196,7 +196,7 @@ sqlite3 *open_and_init_db() {
     if (ver > DB_VERSION) {
         // Don't support downgrading database, delete and retry
         LOGE("sqlite3: Downgrading database is not supported\n");
-        unlink(MAGISKDB);
+        unlink(SUPERSUDB);
         return open_and_init_db();
     }
 
@@ -276,7 +276,7 @@ sqlite3 *open_and_init_db() {
     if (ver == 10) {
         sql_chk_log(sql_exec_impl, db.get(),
                 "DROP TABLE IF EXISTS hidelist;"
-                "DELETE FROM settings WHERE key='magiskhide';");
+                "DELETE FROM settings WHERE key='supersuhide';");
         sql_chk_log(create_denylist);
         ver = 11;
         upgrade = true;

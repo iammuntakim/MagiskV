@@ -1,5 +1,5 @@
 [package]
-name = "magiskpolicy"
+name = "supersupolicy"
 version.workspace = true
 edition.workspace = true
 

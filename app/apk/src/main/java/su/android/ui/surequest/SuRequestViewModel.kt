@@ -21,7 +21,7 @@ import su.android.arch.BaseViewModel
 import su.android.core.AppContext
 import su.android.core.Config
 import su.android.core.R
-import su.android.core.data.magiskdb.PolicyDao
+import su.android.core.data.supersudb.PolicyDao
 import su.android.core.ktx.getLabel
 import su.android.core.ktx.toast
 import su.android.core.model.su.SuPolicy.Companion.ALLOW

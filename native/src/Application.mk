@@ -6,7 +6,7 @@ APP_PLATFORM     := android-23
 APP_THIN_ARCHIVE := true
 APP_STRIP_MODE   := none
 
-ifdef MAGISK_DEBUG
+ifdef SUPERSU_DEBUG
 
 NDK_APP_OUT 	 := ./obj/debug
 APP_CFLAGS       += -flto=thin -gdwarf-4

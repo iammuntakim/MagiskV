@@ -29,7 +29,7 @@ class RootUtils(stub: Any?) : RootService() {
     init {
         Timber.plant(object : Timber.DebugTree() {
             override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-                super.log(priority, "Magisk", message, t)
+                super.log(priority, "SuperSU", message, t)
             }
         })
     }
@@ -83,8 +83,8 @@ class RootUtils(stub: Any?) : RootService() {
                 name=Systemless Hosts
                 version=1.0
                 versionCode=1
-                author=Magisk
-                description=Magisk app built-in systemless hosts module
+                author=SuperSU
+                description=SuperSU app built-in systemless hosts module
             """.trimIndent())
         }
         File("/system/etc/hosts").copyTo(hosts)

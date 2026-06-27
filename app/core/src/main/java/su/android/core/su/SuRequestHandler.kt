@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import su.android.core.BuildConfig
 import su.android.core.Config
-import su.android.core.data.magiskdb.PolicyDao
+import su.android.core.data.supersudb.PolicyDao
 import su.android.core.ktx.getPackageInfo
 import su.android.core.model.su.SuPolicy
 import com.topjohnwu.superuser.Shell

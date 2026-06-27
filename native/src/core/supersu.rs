@@ -1,6 +1,6 @@
-use crate::consts::{APPLET_NAMES, MAGISK_VER_CODE, MAGISK_VERSION, POST_FS_DATA_WAIT_TIME};
+use crate::consts::{APPLET_NAMES, SUPERSU_VER_CODE, SUPERSU_VERSION, POST_FS_DATA_WAIT_TIME};
 use crate::daemon::connect_daemon;
-use crate::ffi::{RequestCode, denylist_cli, get_magisk_tmp, install_module, unlock_blocks};
+use crate::ffi::{RequestCode, denylist_cli, get_supersu_tmp, install_module, unlock_blocks};
 use crate::mount::find_preinit_device;
 use crate::selinux::restorecon;
 use crate::socket::{Decodable, Encodable};
@@ -13,10 +13,10 @@ use std::process::exit;
 
 fn print_usage() {
     eprintln!(
-        r#"Magisk - Multi-purpose Utility
+        r#"SuperSU - Multi-purpose Utility
 
-Usage: magisk [applet [arguments]...]
-   or: magisk [options]...
+Usage: supersu [applet [arguments]...]
+   or: supersu [options]...
 
 Options:
    -c                        print current binary version
@@ -27,16 +27,16 @@ Options:
    --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
-   --daemon                  manually start magisk daemon
-   --stop                    remove all magisk changes and stop daemon
+   --daemon                  manually start supersu daemon
+   --stop                    remove all supersu changes and stop daemon
    --[init trigger]          callback on init triggers. Valid triggers:
                              post-fs-data, service, boot-complete, zygote-restart
    --unlock-blocks           set BLKROSET flag to OFF for all block devices
-   --restorecon              restore selinux context on Magisk files
+   --restorecon              restore selinux context on SuperSU files
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
-   --sqlite SQL              exec SQL commands to Magisk database
-   --path                    print Magisk tmpfs mount path
+   --sqlite SQL              exec SQL commands to SuperSU database
+   --path                    print SuperSU tmpfs mount path
    --denylist ARGS           denylist config CLI
    --preinit-device          resolve a device to store preinit files
 
@@ -50,12 +50,12 @@ Available applets:
 #[derive(FromArgs)]
 struct Cli {
     #[argh(subcommand)]
-    action: MagiskAction,
+    action: SuperSUAction,
 }
 
 #[derive(FromArgs)]
 #[argh(subcommand)]
-enum MagiskAction {
+enum SuperSUAction {
     LocalVersion(LocalVersion),
     Version(Version),
     VersionCode(VersionCode),
@@ -180,15 +180,15 @@ struct DenyList {
 #[argh(subcommand, name = "--preinit-device")]
 struct PreInitDevice {}
 
-impl MagiskAction {
+impl SuperSUAction {
     fn exec(self) -> LoggedResult<i32> {
-        use MagiskAction::*;
+        use SuperSUAction::*;
         match self {
             LocalVersion(_) => {
                 #[cfg(debug_assertions)]
-                println!("{MAGISK_VERSION}:MAGISK:D ({MAGISK_VER_CODE})");
+                println!("{SUPERSU_VERSION}:SUPERSU:D ({SUPERSU_VER_CODE})");
                 #[cfg(not(debug_assertions))]
-                println!("{MAGISK_VERSION}:MAGISK:R ({MAGISK_VER_CODE})");
+                println!("{SUPERSU_VERSION}:SUPERSU:R ({SUPERSU_VER_CODE})");
             }
             Version(_) => {
                 let mut fd = connect_daemon(RequestCode::CHECK_VERSION, false)?;
@@ -262,7 +262,7 @@ impl MagiskAction {
                 }
             }
             Path(_) => {
-                let tmp = get_magisk_tmp();
+                let tmp = get_supersu_tmp();
                 if tmp.is_empty() {
                     return Ok(1);
                 } else {
@@ -285,7 +285,7 @@ impl MagiskAction {
     }
 }
 
-pub fn magisk_main(argc: i32, argv: *mut *mut c_char) -> i32 {
+pub fn supersu_main(argc: i32, argv: *mut *mut c_char) -> i32 {
     if argc < 2 {
         print_usage();
         exit(1);

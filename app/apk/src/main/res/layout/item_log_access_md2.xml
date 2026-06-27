@@ -58,7 +58,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="@string/magisk" />
+                tools:text="@string/supersu" />
 
             <TextView
                 android:id="@+id/log_info"

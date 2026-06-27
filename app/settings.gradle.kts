@@ -7,5 +7,5 @@ dependencyResolutionManagement {
         maven("https://jitpack.io")
     }
 }
-rootProject.name = "Magisk"
+rootProject.name = "SuperSU"
 include(":apk", ":core", ":shared", ":stub", ":test")

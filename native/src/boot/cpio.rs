@@ -145,7 +145,7 @@ struct List {
 
 pub(crate) fn print_cpio_usage() {
     eprintln!(
-        r#"Usage: magiskboot cpio <incpio> [commands...]
+        r#"Usage: supersuboot cpio <incpio> [commands...]
 
 Do cpio commands to <incpio> (modifications are done in-place).
 Each command is a single argument; add quotes for each command.
@@ -169,7 +169,7 @@ Supported commands:
     Extract ENTRY to OUT, or extract all entries to current directory
   test
     Test the cpio's status. Return values:
-    0:stock    1:Magisk    2:unsupported
+    0:stock    1:SuperSU    2:unsupported
   patch
     Apply ramdisk patches
     Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
@@ -498,7 +498,7 @@ impl Cpio {
     }
 }
 
-const MAGISK_PATCHED: i32 = 1 << 0;
+const SUPERSU_PATCHED: i32 = 1 << 0;
 const UNSUPPORTED_CPIO: i32 = 1 << 1;
 
 impl Cpio {
@@ -548,12 +548,12 @@ impl Cpio {
             }
         }
         for file in [
-            ".backup/.magisk",
-            "init.magisk.rc",
-            "overlay/init.magisk.rc",
+            ".backup/.supersu",
+            "init.supersu.rc",
+            "overlay/init.supersu.rc",
         ] {
             if self.exists(file) {
-                return MAGISK_PATCHED;
+                return SUPERSU_PATCHED;
             }
         }
         0
@@ -569,7 +569,7 @@ impl Cpio {
                     if let Ok(data) = str::from_utf8(&entry.data) {
                         rm_list.push_str(data);
                     }
-                } else if name != ".backup/.magisk" {
+                } else if name != ".backup/.supersu" {
                     let new_name = if name.ends_with(".xz") && entry.decompress() {
                         &name[8..name.len() - 3]
                     } else {
@@ -778,7 +778,7 @@ pub(crate) fn cpio_commands(file: &Utf8CStr, cmds: &Vec<String>) -> LoggedResult
             continue;
         }
         let mut cmd = CpioCommand::from_args(
-            &["magiskboot", "cpio", file],
+            &["supersuboot", "cpio", file],
             cmd.split(' ')
                 .filter(|x| !x.is_empty())
                 .collect::<Vec<_>>()

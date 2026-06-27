@@ -33,7 +33,7 @@ class LogViewModel(
     // --- empty view
 
     val itemEmpty = TextItem(R.string.log_data_none)
-    val itemMagiskEmpty = TextItem(R.string.log_data_magisk_none)
+    val itemSuperSUEmpty = TextItem(R.string.log_data_supersu_none)
 
     // --- su log
 
@@ -42,16 +42,16 @@ class LogViewModel(
         it.put(BR.viewModel, this)
     }
 
-    // --- magisk log
+    // --- supersu log
     val logs = diffList<LogRvItem>()
-    var magiskLogRaw = " "
+    var supersuLogRaw = " "
 
     override suspend fun doLoadWork() {
         loading = true
 
         val (suLogs, suDiff) = withContext(Dispatchers.Default) {
-            magiskLogRaw = repo.fetchMagiskLogs()
-            val newLogs = magiskLogRaw.split('\n').map { LogRvItem(it) }
+            supersuLogRaw = repo.fetchSuperSULogs()
+            val newLogs = supersuLogRaw.split('\n').map { LogRvItem(it) }
             logs.update(newLogs)
             val suLogs = repo.fetchSuLogs().map { SuLogRvItem(it) }
             suLogs to items.calculateDiff(suLogs)
@@ -65,9 +65,9 @@ class LogViewModel(
         loading = false
     }
 
-    fun saveMagiskLog() = withExternalRW {
+    fun saveSuperSULog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
-            val filename = "magisk_log_%s.log".format(
+            val filename = "supersu_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard))
             val logFile = MediaStoreUtils.getFile(filename)
             logFile.uri.outputStream().bufferedWriter().use { file ->
@@ -88,9 +88,9 @@ class LogViewModel(
                 file.write("\n\n---System MountInfo---\n\n")
                 FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
-                file.write("\n---Magisk Logs---\n")
+                file.write("\n---SuperSU Logs---\n")
                 file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
-                if (Info.env.isActive) file.write(magiskLogRaw)
+                if (Info.env.isActive) file.write(supersuLogRaw)
 
                 file.write("\n---Manager Logs---\n")
                 file.write("${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})\n\n")
@@ -101,7 +101,7 @@ class LogViewModel(
         }
     }
 
-    fun clearMagiskLog() = repo.clearMagiskLogs {
+    fun clearSuperSULog() = repo.clearSuperSULogs {
         SnackbarEvent(R.string.logs_cleared).publish()
         startLoading()
     }

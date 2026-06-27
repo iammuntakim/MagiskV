@@ -63,7 +63,7 @@ public class DynLoad {
         // Copy from external for easier development
         if (BuildConfig.DEBUG) {
             try {
-                File external = new File(context.getExternalFilesDir(null), "magisk.apk");
+                File external = new File(context.getExternalFilesDir(null), "supersu.apk");
                 if (external.exists()) {
                     apk.delete();
                     try {

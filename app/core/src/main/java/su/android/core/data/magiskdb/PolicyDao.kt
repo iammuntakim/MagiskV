@@ -1,4 +1,4 @@
-package su.android.core.data.magiskdb
+package su.android.core.data.supersudb
 
 import su.android.core.AppContext
 import su.android.core.Const
@@ -6,7 +6,7 @@ import su.android.core.model.su.SuPolicy
 
 private const val SELECT_QUERY = "SELECT (until - strftime(\"%s\", \"now\")) AS remain, *"
 
-class PolicyDao : MagiskDB() {
+class PolicyDao : SuperSUDB() {
 
     suspend fun deleteOutdated() {
         val query = "DELETE FROM ${Table.POLICY} WHERE " +

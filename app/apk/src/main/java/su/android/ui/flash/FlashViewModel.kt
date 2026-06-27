@@ -17,7 +17,7 @@ import su.android.core.ktx.synchronized
 import su.android.core.ktx.timeFormatStandard
 import su.android.core.ktx.toTime
 import su.android.core.tasks.FlashZip
-import su.android.core.tasks.MagiskInstaller
+import su.android.core.tasks.SuperSUInstaller
 import su.android.core.utils.MediaStoreUtils
 import su.android.core.utils.MediaStoreUtils.outputStream
 import su.android.databinding.set
@@ -63,22 +63,22 @@ class FlashViewModel : BaseViewModel() {
                 }
                 Const.Value.UNINSTALL -> {
                     showReboot = false
-                    MagiskInstaller.Uninstall(outItems, logItems).exec()
+                    SuperSUInstaller.Uninstall(outItems, logItems).exec()
                 }
-                Const.Value.FLASH_MAGISK -> {
+                Const.Value.FLASH_SUPERSU -> {
                     if (Info.isEmulator)
-                        MagiskInstaller.Emulator(outItems, logItems).exec()
+                        SuperSUInstaller.Emulator(outItems, logItems).exec()
                     else
-                        MagiskInstaller.Direct(outItems, logItems).exec()
+                        SuperSUInstaller.Direct(outItems, logItems).exec()
                 }
                 Const.Value.FLASH_INACTIVE_SLOT -> {
                     showReboot = false
-                    MagiskInstaller.SecondSlot(outItems, logItems).exec()
+                    SuperSUInstaller.SecondSlot(outItems, logItems).exec()
                 }
                 Const.Value.PATCH_FILE -> {
                     uri ?: return@launch
                     showReboot = false
-                    MagiskInstaller.Patch(uri, outItems, logItems).exec()
+                    SuperSUInstaller.Patch(uri, outItems, logItems).exec()
                 }
                 else -> {
                     back()
@@ -102,7 +102,7 @@ class FlashViewModel : BaseViewModel() {
 
     private fun savePressed() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
-            val name = "magisk_install_log_%s.log".format(
+            val name = "supersu_install_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard)
             )
             val file = MediaStoreUtils.getFile(name)

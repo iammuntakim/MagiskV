@@ -13,7 +13,7 @@ import su.android.core.ktx.cachedFile
 import su.android.core.model.module.LocalModule
 import su.android.core.tasks.AppMigration
 import su.android.core.tasks.FlashZip
-import su.android.core.tasks.MagiskInstaller
+import su.android.core.tasks.SuperSUInstaller
 import su.android.core.utils.RootUtils
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
@@ -47,7 +47,7 @@ class Environment : BaseTest {
 
         // It is possible that there are no suitable preinit partition to use
         fun preinit(): Boolean {
-            return Shell.cmd("magisk --preinit-device").exec().isSuccess
+            return Shell.cmd("supersu --preinit-device").exec().isSuccess
         }
 
         fun lsposed(): Boolean {
@@ -93,7 +93,7 @@ class Environment : BaseTest {
             val script = zip.getInputStream(
                 zip.getEntry("META-INF/com/google/android/updater-script")
             ).use { it.readBytes() }
-            assertArrayEquals(MODULE_ERROR, "#MAGISK\n".toByteArray(), script)
+            assertArrayEquals(MODULE_ERROR, "#SUPERSU\n".toByteArray(), script)
         }
     }
 
@@ -135,7 +135,7 @@ class Environment : BaseTest {
 
         // Add sepolicy patch
         PrintStream(path.getChildFile("sepolicy.rule").newOutputStream()).use {
-            it.println("type magisk_test domain")
+            it.println("type supersu_test domain")
         }
 
         assertTrue(error, Shell.cmd(
@@ -212,8 +212,8 @@ class Environment : BaseTest {
     fun setupEnvironment() {
         runBlocking {
             assertTrue(
-                "Magisk setup failed",
-                MagiskInstaller.Emulator(TimberLog, TimberLog).exec()
+                "SuperSU setup failed",
+                SuperSUInstaller.Emulator(TimberLog, TimberLog).exec()
             )
         }
 

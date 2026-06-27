@@ -1,13 +1,13 @@
 use crate::bootstages::BootState;
 use crate::consts::{
-    MAGISK_FILE_CON, MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE, MAGISK_VERSION,
+    SUPERSU_FILE_CON, SUPERSU_FULL_VER, SUPERSU_PROC_CON, SUPERSU_VER_CODE, SUPERSU_VERSION,
     MAIN_CONFIG, MAIN_SOCKET, ROOTMNT, ROOTOVL,
 };
 use crate::db::Sqlite3;
 use crate::ffi::{
-    ModuleInfo, RequestCode, RespondCode, denylist_handler, get_magisk_tmp, scan_deny_apps,
+    ModuleInfo, RequestCode, RespondCode, denylist_handler, get_supersu_tmp, scan_deny_apps,
 };
-use crate::logging::{android_logging, magisk_logging, setup_logfile, start_log_daemon};
+use crate::logging::{android_logging, supersu_logging, setup_logfile, start_log_daemon};
 use crate::v_api::start_v_api_if_enabled;
 use crate::module::remove_modules;
 use crate::package::ManagerInfo;
@@ -37,8 +37,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::nonpoison::Mutex;
 use std::time::Duration;
 
-// Global magiskd singleton
-pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
+// Global supersud singleton
+pub static SUPERSUD: OnceLock<SuperSUD> = OnceLock::new();
 
 pub const AID_ROOT: i32 = 0;
 pub const AID_SHELL: i32 = 2000;
@@ -55,7 +55,7 @@ pub const fn to_user_id(uid: i32) -> i32 {
 }
 
 #[derive(Default)]
-pub struct MagiskD {
+pub struct SuperSUD {
     pub sql_connection: Mutex<Option<Sqlite3>>,
     pub manager_info: Mutex<ManagerInfo>,
     pub boot_stage_lock: Mutex<BootState>,
@@ -70,9 +70,9 @@ pub struct MagiskD {
     exe_attr: FileAttr,
 }
 
-impl MagiskD {
-    pub fn get() -> &'static MagiskD {
-        unsafe { MAGISKD.get().unwrap_unchecked() }
+impl SuperSUD {
+    pub fn get() -> &'static SuperSUD {
+        unsafe { SUPERSUD.get().unwrap_unchecked() }
     }
 
     pub fn sdk_int(&self) -> i32 {
@@ -91,14 +91,14 @@ impl MagiskD {
         match code {
             RequestCode::CHECK_VERSION => {
                 #[cfg(debug_assertions)]
-                let s = concatcp!(MAGISK_VERSION, ":MAGISK:D");
+                let s = concatcp!(SUPERSU_VERSION, ":SUPERSU:D");
                 #[cfg(not(debug_assertions))]
-                let s = concatcp!(MAGISK_VERSION, ":MAGISK:R");
+                let s = concatcp!(SUPERSU_VERSION, ":SUPERSU:R");
 
                 client.write_encodable(s).log_ok();
             }
             RequestCode::CHECK_VERSION_CODE => {
-                client.write_pod(&MAGISK_VER_CODE).log_ok();
+                client.write_pod(&SUPERSU_VER_CODE).log_ok();
             }
             RequestCode::START_DAEMON => {
                 setup_logfile();
@@ -284,7 +284,7 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
 }
 
 fn daemon_entry() {
-    set_nice_name(cstr!("magiskd"));
+    set_nice_name(cstr!("supersud"));
     android_logging();
 
     // Block all signals
@@ -301,26 +301,26 @@ fn daemon_entry() {
 
     setsid().log_ok();
 
-    // Make sure the current context is magisk
+    // Make sure the current context is supersu
     if let Ok(mut current) =
         cstr!("/proc/self/attr/current").open(OFlag::O_WRONLY | OFlag::O_CLOEXEC)
     {
-        let con = cstr!(MAGISK_PROC_CON);
+        let con = cstr!(SUPERSU_PROC_CON);
         current.write_all(con.as_bytes_with_nul()).log_ok();
     }
 
     start_log_daemon();
-    magisk_logging();
-    info!("Magisk {MAGISK_FULL_VER} daemon started");
+    supersu_logging();
+    info!("SuperSU {SUPERSU_FULL_VER} daemon started");
 
     let is_emulator = get_prop(cstr!("ro.kernel.qemu")) == "1"
         || get_prop(cstr!("ro.boot.qemu")) == "1"
         || get_prop(cstr!("ro.product.device")).contains("vsoc");
 
     // Load config status
-    let magisk_tmp = get_magisk_tmp();
+    let supersu_tmp = get_supersu_tmp();
     let mut tmp_path = cstr::buf::new::<64>()
-        .join_path(magisk_tmp)
+        .join_path(supersu_tmp)
         .join_path(MAIN_CONFIG);
     let mut is_recovery = false;
     if let Ok(main_config) = tmp_path.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
@@ -332,7 +332,7 @@ fn daemon_entry() {
             true
         });
     }
-    tmp_path.truncate(magisk_tmp.len());
+    tmp_path.truncate(supersu_tmp.len());
 
     let mut sdk_int = -1;
     if let Ok(build_prop) = cstr!("/system/build.prop").open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
@@ -378,7 +378,7 @@ fn daemon_entry() {
             true
         })
     }
-    tmp_path.truncate(magisk_tmp.len());
+    tmp_path.truncate(supersu_tmp.len());
 
     // Remount rootfs as read-only if requested
     if std::env::var_os("REMOUNT_ROOT").is_some() {
@@ -389,7 +389,7 @@ fn daemon_entry() {
     // Remove all pre-init overlay files to free-up memory
     tmp_path.append_path(ROOTOVL);
     tmp_path.remove_all().ok();
-    tmp_path.truncate(magisk_tmp.len());
+    tmp_path.truncate(supersu_tmp.len());
 
     let exe_attr = cstr!("/proc/self/exe")
         .follow_link()
@@ -397,18 +397,18 @@ fn daemon_entry() {
         .log()
         .unwrap_or_default();
 
-    let daemon = MagiskD {
+    let daemon = SuperSUD {
         sdk_int,
         is_emulator,
         is_recovery,
         exe_attr,
         ..Default::default()
     };
-    MAGISKD.set(daemon).ok();
-    start_v_api_if_enabled(MagiskD::get());
+    SUPERSUD.set(daemon).ok();
+    start_v_api_if_enabled(SuperSUD::get());
 
     let sock_path = cstr::buf::new::<64>()
-        .join_path(get_magisk_tmp())
+        .join_path(get_supersu_tmp())
         .join_path(MAIN_SOCKET);
     sock_path.remove().ok();
 
@@ -417,10 +417,10 @@ fn daemon_entry() {
     };
 
     sock_path.follow_link().chmod(0o666).log_ok();
-    sock_path.set_secontext(cstr!(MAGISK_FILE_CON)).log_ok();
+    sock_path.set_secontext(cstr!(SUPERSU_FILE_CON)).log_ok();
 
     // Loop forever to listen for requests
-    let daemon = MagiskD::get();
+    let daemon = SuperSUD::get();
     for client in sock.incoming() {
         if let Ok(client) = client.log() {
             daemon.handle_requests(client);
@@ -432,7 +432,7 @@ fn daemon_entry() {
 
 pub fn connect_daemon(code: RequestCode, create: bool) -> LoggedResult<UnixStream> {
     let sock_path = cstr::buf::new::<64>()
-        .join_path(get_magisk_tmp())
+        .join_path(get_supersu_tmp())
         .join_path(MAIN_SOCKET);
 
     fn send_request(code: RequestCode, mut socket: UnixStream) -> LoggedResult<UnixStream> {
@@ -463,9 +463,9 @@ pub fn connect_daemon(code: RequestCode, create: bool) -> LoggedResult<UnixStrea
 
             let mut buf = cstr::buf::new::<64>();
             if cstr!("/proc/self/exe").read_link(&mut buf).is_err()
-                || !buf.starts_with(get_magisk_tmp().as_str())
+                || !buf.starts_with(get_supersu_tmp().as_str())
             {
-                return log_err!("Start daemon on magisk tmpfs");
+                return log_err!("Start daemon on supersu tmpfs");
             }
 
             // Fork a process and run the daemon

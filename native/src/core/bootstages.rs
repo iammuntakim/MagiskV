@@ -1,8 +1,8 @@
 use crate::consts::{APP_PACKAGE_NAME, BBPATH, DATABIN, MODULEROOT, SECURE_DIR};
-use crate::daemon::MagiskD;
+use crate::daemon::SuperSUD;
 use crate::ffi::{
     DbEntryKey, RequestCode, check_key_combo, exec_common_scripts, exec_module_scripts,
-    get_magisk_tmp, initialize_denylist,
+    get_supersu_tmp, initialize_denylist,
 };
 use crate::v_api::start_v_api_if_enabled;
 use crate::logging::setup_logfile;
@@ -29,9 +29,9 @@ bitflags! {
     }
 }
 
-impl MagiskD {
-    fn setup_magisk_env(&self) -> bool {
-        info!("* Initializing Magisk environment");
+impl SuperSUD {
+    fn setup_supersu_env(&self) -> bool {
+        info!("* Initializing SuperSU environment");
 
         let mut buf = cstr::buf::default();
 
@@ -43,8 +43,8 @@ impl MagiskD {
 
         // Alternative binaries paths
         let alt_bin_dirs = &[
-            cstr!("/cache/data_adb/magisk"),
-            cstr!("/data/magisk"),
+            cstr!("/cache/data_adb/supersu"),
+            cstr!("/data/supersu"),
             app_bin_dir,
         ];
         for dir in alt_bin_dirs {
@@ -73,7 +73,7 @@ impl MagiskD {
             return false;
         }
 
-        let tmp_bb = buf.append_path(get_magisk_tmp()).append_path(BBPATH);
+        let tmp_bb = buf.append_path(get_supersu_tmp()).append_path(BBPATH);
         tmp_bb.mkdirs(0o755).ok();
         tmp_bb.append_path("busybox");
         busybox.copy_to(tmp_bb).ok();
@@ -89,19 +89,19 @@ impl MagiskD {
             .status()
             .log_ok();
 
-        // magisk32 and magiskpolicy are not installed into ramdisk and has to be copied
-        // from data to magisk tmp
-        let magisk32 = cstr!(concatcp!(DATABIN, "/magisk32"));
-        if magisk32.exists() {
-            let tmp = buf.append_path(get_magisk_tmp()).append_path("magisk32");
-            magisk32.copy_to(tmp).log_ok();
+        // supersu32 and supersupolicy are not installed into ramdisk and has to be copied
+        // from data to supersu tmp
+        let supersu32 = cstr!(concatcp!(DATABIN, "/supersu32"));
+        if supersu32.exists() {
+            let tmp = buf.append_path(get_supersu_tmp()).append_path("supersu32");
+            supersu32.copy_to(tmp).log_ok();
         }
-        let magiskpolicy = cstr!(concatcp!(DATABIN, "/magiskpolicy"));
-        if magiskpolicy.exists() {
+        let supersupolicy = cstr!(concatcp!(DATABIN, "/supersupolicy"));
+        if supersupolicy.exists() {
             let tmp = buf
-                .append_path(get_magisk_tmp())
-                .append_path("magiskpolicy");
-            magiskpolicy.copy_to(tmp).log_ok();
+                .append_path(get_supersu_tmp())
+                .append_path("supersupolicy");
+            supersupolicy.copy_to(tmp).log_ok();
         }
 
         true
@@ -126,8 +126,8 @@ impl MagiskD {
 
         self.prune_su_access();
 
-        if !self.setup_magisk_env() {
-            error!("* Magisk environment incomplete, abort");
+        if !self.setup_supersu_env() {
+            error!("* SuperSU environment incomplete, abort");
             return true;
         }
 

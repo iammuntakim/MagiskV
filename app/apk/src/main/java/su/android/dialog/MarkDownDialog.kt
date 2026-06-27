@@ -7,7 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import su.android.R
 import su.android.core.di.ServiceLocator
 import su.android.events.DialogBuilder
-import su.android.view.MagiskDialog
+import su.android.view.SuperSUDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,7 +20,7 @@ abstract class MarkDownDialog : DialogBuilder {
     abstract suspend fun getMarkdownText(): String
 
     @CallSuper
-    override fun build(dialog: MagiskDialog) {
+    override fun build(dialog: SuperSUDialog) {
         with(dialog) {
             val view = LayoutInflater.from(context).inflate(R.layout.markdown_window_md2, null)
             setView(view)

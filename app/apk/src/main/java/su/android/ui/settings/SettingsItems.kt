@@ -22,7 +22,7 @@ import su.android.databinding.DialogSettingsUpdateChannelBinding
 import su.android.databinding.set
 import su.android.utils.TextHolder
 import su.android.utils.asText
-import su.android.view.MagiskDialog
+import su.android.view.SuperSUDialog
 import com.topjohnwu.superuser.Shell
 import su.android.core.R as CoreR
 
@@ -97,16 +97,16 @@ object Restore : BaseSettingsItem.Blank() {
 
     override fun onPressed(view: View, handler: Handler) {
         handler.onItemPressed(view, this) {
-            MagiskDialog(view.activity).apply {
+            SuperSUDialog(view.activity).apply {
                 setTitle(CoreR.string.settings_restore_app_title)
                 setMessage(CoreR.string.restore_app_confirmation)
-                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                setButton(SuperSUDialog.ButtonType.POSITIVE) {
                     text = android.R.string.ok
                     onClick {
                         handler.onItemAction(view, this@Restore)
                     }
                 }
-                setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                setButton(SuperSUDialog.ButtonType.NEGATIVE) {
                     text = android.R.string.cancel
                 }
                 setCancelable(true)
@@ -199,10 +199,10 @@ object RandNameToggle : BaseSettingsItem.Toggle() {
     override var value by Config::randName
 }
 
-// --- Magisk
+// --- SuperSU
 
-object Magisk : BaseSettingsItem.Section() {
-    override val title = CoreR.string.magisk.asText()
+object SuperSU : BaseSettingsItem.Section() {
+    override val title = CoreR.string.supersu.asText()
 }
 
 object Zygisk : BaseSettingsItem.Toggle() {
@@ -227,7 +227,7 @@ object DenyList : BaseSettingsItem.Toggle() {
         set(value) {
             field = value
             val cmd = if (value) "enable" else "disable"
-            Shell.cmd("magisk --denylist $cmd").submit { result ->
+            Shell.cmd("supersu --denylist $cmd").submit { result ->
                 if (result.isSuccess) {
                     Config.denyList = value
                 } else {

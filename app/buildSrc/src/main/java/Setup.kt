@@ -52,7 +52,7 @@ fun Project.setupCommon() {
             }
         }
         buildToolsVersion = "36.1.0"
-        ndkPath = "${androidComponents.sdkComponents.sdkDirectory.get().asFile}/ndk/magisk"
+        ndkPath = "${androidComponents.sdkComponents.sdkDirectory.get().asFile}/ndk/supersu"
         ndkVersion = "29.0.14206865"
 
         defaultConfig.apply {
@@ -117,7 +117,7 @@ private fun Project.downloadFile(url: String, checksum: String): File {
 }
 
 const val BUSYBOX_DOWNLOAD_URL =
-    "https://github.com/topjohnwu/magisk-files/releases/download/files/busybox-1.36.1.1.zip"
+    "https://github.com/topjohnwu/supersu-files/releases/download/files/busybox-1.36.1.1.zip"
 const val BUSYBOX_ZIP_CHECKSUM =
     "b4d0551feabaf314e53c79316c980e8f66432e9fb91a69dbbf10a93564b40951"
 
@@ -143,7 +143,7 @@ fun Project.setupCoreLib() {
                 for (abi in abiList) {
                     into(abi) {
                         from(rootFile("native/out/$abi")) {
-                            include("magiskboot", "magiskinit", "magiskpolicy", "magisk", "libinit-ld.so")
+                            include("supersuboot", "supersuinit", "supersupolicy", "supersu", "libinit-ld.so")
                             rename { if (it.endsWith(".so")) it else "lib$it.so" }
                         }
                     }
@@ -204,8 +204,8 @@ fun Project.setupCoreLib() {
                 filesMatching("**/util_functions.sh") {
                     filter {
                         it.replace(
-                            "#MAGISK_VERSION_STUB",
-                            "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
+                            "#SUPERSU_VERSION_STUB",
+                            "SUPERSU_VER='${Config.version}'\nSUPERSU_VER_CODE=${Config.versionCode}"
                         )
                     }
                     filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
@@ -240,9 +240,9 @@ fun Project.setupAppCommon() {
                 } else {
                     // GitHub secrets থেকে নাও
                     storeFile = rootFile(System.getenv("KEYSTORE_FILE") ?: "key.jks")
-                    this.storePassword = System.getenv("KEY_PASSWORD") ?: "magisksu"
-                    this.keyAlias = System.getenv("KEY_ALIAS") ?: "magiskpro"
-                    this.keyPassword = System.getenv("KEY_PASSWORD") ?: "magisksu"
+                    this.storePassword = System.getenv("KEY_PASSWORD") ?: "supersusu"
+                    this.keyAlias = System.getenv("KEY_ALIAS") ?: "supersupro"
+                    this.keyPassword = System.getenv("KEY_PASSWORD") ?: "supersusu"
                 }
             }
         }

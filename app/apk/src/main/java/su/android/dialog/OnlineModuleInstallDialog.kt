@@ -7,7 +7,7 @@ import su.android.core.download.DownloadEngine
 import su.android.core.download.Subject
 import su.android.core.model.module.OnlineModule
 import su.android.ui.flash.FlashFragment
-import su.android.view.MagiskDialog
+import su.android.view.SuperSUDialog
 import su.android.view.Notifications
 import kotlinx.parcelize.Parcelize
 
@@ -29,7 +29,7 @@ class OnlineModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog
         override fun pendingIntent(context: Context) = FlashFragment.installIntent(context, file)
     }
 
-    override fun build(dialog: MagiskDialog) {
+    override fun build(dialog: SuperSUDialog) {
         super.build(dialog)
         dialog.apply {
 
@@ -42,15 +42,15 @@ class OnlineModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog
 
             setTitle(title)
             setCancelable(true)
-            setButton(MagiskDialog.ButtonType.NEGATIVE) {
+            setButton(SuperSUDialog.ButtonType.NEGATIVE) {
                 text = R.string.download
                 onClick { download(false) }
             }
-            setButton(MagiskDialog.ButtonType.POSITIVE) {
+            setButton(SuperSUDialog.ButtonType.POSITIVE) {
                 text = R.string.install
                 onClick { download(true) }
             }
-            setButton(MagiskDialog.ButtonType.NEUTRAL) {
+            setButton(SuperSUDialog.ButtonType.NEUTRAL) {
                 text = android.R.string.cancel
             }
         }

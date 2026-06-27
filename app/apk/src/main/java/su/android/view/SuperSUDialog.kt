@@ -22,7 +22,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import su.android.BR
 import su.android.R
 import su.android.arch.UIActivity
-import su.android.databinding.DialogMagiskBaseBinding
+import su.android.databinding.DialogSuperSUBaseBinding
 import su.android.databinding.DiffItem
 import su.android.databinding.ItemWrapper
 import su.android.databinding.ObservableHost
@@ -30,16 +30,16 @@ import su.android.databinding.RvItem
 import su.android.databinding.bindExtra
 import su.android.databinding.set
 import su.android.databinding.setAdapter
-import su.android.view.MagiskDialog.DialogClickListener
+import su.android.view.SuperSUDialog.DialogClickListener
 
 typealias DialogButtonClickListener = (DialogInterface) -> Unit
 
-class MagiskDialog(
+class SuperSUDialog(
     context: Activity, theme: Int = 0
 ) : AppCompatDialog(context, theme) {
 
-    private val binding: DialogMagiskBaseBinding =
-        DialogMagiskBaseBinding.inflate(LayoutInflater.from(context))
+    private val binding: DialogSuperSUBaseBinding =
+        DialogSuperSUBaseBinding.inflate(LayoutInflater.from(context))
     private val data = Data()
 
     val activity: UIActivity<*> get() = ownerActivity as UIActivity<*>
@@ -119,7 +119,7 @@ class MagiskDialog(
         }
 
         fun clicked() {
-            onClickAction(this@MagiskDialog)
+            onClickAction(this@SuperSUDialog)
             if (!doNotDismiss) {
                 dismiss()
             }

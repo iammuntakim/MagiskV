@@ -1,6 +1,6 @@
 package su.android.core.model.su
 
-import su.android.core.data.magiskdb.MagiskDB
+import su.android.core.data.supersudb.SuperSUDB
 
 class SuPolicy(
     val uid: Int,
@@ -20,7 +20,7 @@ class SuPolicy(
         val until = if (remain <= 0) {
             remain
         } else {
-            MagiskDB.Literal("(strftime(\"%s\", \"now\") + $remain)")
+            SuperSUDB.Literal("(strftime(\"%s\", \"now\") + $remain)")
         }
         return mutableMapOf(
             "uid" to uid,

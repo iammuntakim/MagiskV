@@ -1,6 +1,6 @@
-package su.android.core.data.magiskdb
+package su.android.core.data.supersudb
 
-class StringDao : MagiskDB() {
+class StringDao : SuperSUDB() {
 
     suspend fun delete(key: String) {
         val query = "DELETE FROM ${Table.STRINGS} WHERE key=\"$key\""

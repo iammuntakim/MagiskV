@@ -26,8 +26,8 @@ object Config {
     fun contains(key: String) = get(key) != null
 
     val version: String get() = get("version") ?: commitHash
-    val versionCode: Int get() = get("magisk.versionCode")!!.toInt()
-    val stubVersion: String get() = get("magisk.stubVersion")!!
+    val versionCode: Int get() = get("supersu.versionCode")!!.toInt()
+    val stubVersion: String get() = get("supersu.stubVersion")!!
     val abiList: Set<String> get() {
         val abiList = get("abiList") ?: return defaultAbis
         return abiList.split(Regex("\\s*,\\s*")).toSet() intersect supportAbis
@@ -40,15 +40,15 @@ fun Project.rootFile(path: String): File {
     else File(rootProject.file(".."), path)
 }
 
-class MagiskPlugin : Plugin<Project> {
+class SuperSUPlugin : Plugin<Project> {
     override fun apply(project: Project) = project.applyPlugin()
 
     private fun Project.applyPlugin() {
         initRandom(rootProject.file("dict.txt"))
         props.clear()
 
-        // Get gradle properties relevant to Magisk
-        props.putAll(properties.filter { (key, _) -> key.startsWith("magisk.") })
+        // Get gradle properties relevant to SuperSU
+        props.putAll(properties.filter { (key, _) -> key.startsWith("supersu.") })
 
         // Load config.prop
         val configPath: String? by this

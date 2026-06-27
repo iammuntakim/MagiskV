@@ -12,7 +12,7 @@ using namespace std;
 
 static const char *bbpath() {
     static string path;
-    path = get_magisk_tmp();
+    path = get_supersu_tmp();
     path += "/" BBPATH "/busybox";
     if (access(path.data(), X_OK) != 0) {
         path = DATABIN "/busybox";
@@ -23,9 +23,9 @@ static const char *bbpath() {
 static void set_script_env() {
     setenv("ASH_STANDALONE", "1", 1);
     char new_path[4096];
-    ssprintf(new_path, sizeof(new_path), "%s:%s", getenv("PATH"), get_magisk_tmp());
+    ssprintf(new_path, sizeof(new_path), "%s:%s", getenv("PATH"), get_supersu_tmp());
     setenv("PATH", new_path, 1);
-    if (MagiskD::Get().zygisk_enabled())
+    if (SuperSUD::Get().zygisk_enabled())
         setenv("ZYGISK_ENABLED", "1", 1);
 };
 
@@ -151,14 +151,14 @@ void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_lis
 
 constexpr char install_script[] = R"EOF(
 APK=%s
-log -t Magisk "pm_install: $APK"
-log -t Magisk "pm_install: $(pm install -g -r $APK 2>&1)"
+log -t SuperSU "pm_install: $APK"
+log -t SuperSU "pm_install: $(pm install -g -r $APK 2>&1)"
 appops set %s REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 
 void install_apk(Utf8CStr apk) {
-    setfilecon(apk.c_str(), MAGISK_FILE_CON);
+    setfilecon(apk.c_str(), SUPERSU_FILE_CON);
     char cmds[sizeof(install_script) + 4096];
     ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME);
     exec_command_async("/system/bin/sh", "-c", cmds);
@@ -166,8 +166,8 @@ void install_apk(Utf8CStr apk) {
 
 constexpr char uninstall_script[] = R"EOF(
 PKG=%s
-log -t Magisk "pm_uninstall: $PKG"
-log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
+log -t SuperSU "pm_uninstall: $PKG"
+log -t SuperSU "pm_uninstall: $(pm uninstall $PKG 2>&1)"
 )EOF";
 
 void uninstall_pkg(Utf8CStr pkg) {
@@ -179,8 +179,8 @@ void uninstall_pkg(Utf8CStr pkg) {
 constexpr char clear_script[] = R"EOF(
 PKG=%s
 USER=%d
-log -t Magisk "pm_clear: $PKG (user=$USER)"
-log -t Magisk "pm_clear: $(pm clear --user $USER $PKG 2>&1)"
+log -t SuperSU "pm_clear: $PKG (user=$USER)"
+log -t SuperSU "pm_clear: $(pm clear --user $USER $PKG 2>&1)"
 )EOF";
 
 void clear_pkg(const char *pkg, int user_id) {
@@ -200,7 +200,7 @@ static void abort(FILE *fp, const char *fmt, ...) {
 }
 
 constexpr char install_module_script[] = R"EOF(
-. /data/adb/magisk/util_functions.sh
+. /data/adb/supersu/util_functions.sh
 install_module
 exit 0
 )EOF";
@@ -211,7 +211,7 @@ void install_module(Utf8CStr file) {
     if (access(DATABIN, F_OK) ||
         access(bbpath(), X_OK) ||
         access(DATABIN "/util_functions.sh", F_OK))
-        abort(stderr, "Incomplete Magisk install");
+        abort(stderr, "Incomplete SuperSU install");
     if (access(file.c_str(), F_OK))
         abort(stderr, "'%s' does not exist", file.c_str());
 
@@ -219,7 +219,7 @@ void install_module(Utf8CStr file) {
     setenv("OUTFD", "1", 1);
     setenv("ZIPFILE", zip, 1);
     setenv("ASH_STANDALONE", "1", 1);
-    setenv("MAGISKTMP", get_magisk_tmp(), 0);
+    setenv("SUPERSUTMP", get_supersu_tmp(), 0);
     free(zip);
 
     int fd = xopen("/dev/null", O_RDONLY);

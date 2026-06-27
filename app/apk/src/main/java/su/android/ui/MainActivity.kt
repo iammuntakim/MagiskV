@@ -34,7 +34,7 @@ import su.android.core.tasks.AppMigration
 import su.android.databinding.ActivityMainMd2Binding
 import su.android.ui.home.HomeFragmentDirections
 import su.android.ui.theme.Theme
-import su.android.view.MagiskDialog
+import su.android.view.SuperSUDialog
 import su.android.view.Shortcuts
 import kotlinx.coroutines.launch
 import java.io.File
@@ -190,10 +190,10 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
     @SuppressLint("InlinedApi")
     override fun showInvalidStateMessage(): Unit = runOnUiThread {
-        MagiskDialog(this).apply {
+        SuperSUDialog(this).apply {
             setTitle(CoreR.string.unsupport_nonroot_stub_title)
             setMessage(CoreR.string.unsupport_nonroot_stub_msg)
-            setButton(MagiskDialog.ButtonType.POSITIVE) {
+            setButton(SuperSUDialog.ButtonType.POSITIVE) {
                 text = CoreR.string.install
                 onClick {
                     withPermission(REQUEST_INSTALL_PACKAGES) {
@@ -215,40 +215,40 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
     private fun showUnsupportedMessage() {
         if (Info.env.isUnsupported) {
-            MagiskDialog(this).apply {
-                setTitle(CoreR.string.unsupport_magisk_title)
-                setMessage(CoreR.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+            SuperSUDialog(this).apply {
+                setTitle(CoreR.string.unsupport_supersu_title)
+                setMessage(CoreR.string.unsupport_supersu_msg, Const.Version.MIN_VERSION)
+                setButton(SuperSUDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
         }
 
         if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
-                ?.filterNot { File("$it/magisk").exists() }
+                ?.filterNot { File("$it/supersu").exists() }
                 ?.any { File("$it/su").exists() } == true) {
-            MagiskDialog(this).apply {
+            SuperSUDialog(this).apply {
                 setTitle(CoreR.string.unsupport_general_title)
                 setMessage(CoreR.string.unsupport_other_su_msg)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setButton(SuperSUDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
         }
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
-            MagiskDialog(this).apply {
+            SuperSUDialog(this).apply {
                 setTitle(CoreR.string.unsupport_general_title)
                 setMessage(CoreR.string.unsupport_system_app_msg)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setButton(SuperSUDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
         }
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
-            MagiskDialog(this).apply {
+            SuperSUDialog(this).apply {
                 setTitle(CoreR.string.unsupport_general_title)
                 setMessage(CoreR.string.unsupport_external_storage_msg)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setButton(SuperSUDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
         }
@@ -259,13 +259,13 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
             ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
             // Ask and show dialog
             Config.askedHome = true
-            MagiskDialog(this).apply {
+            SuperSUDialog(this).apply {
                 setTitle(CoreR.string.add_shortcut_title)
                 setMessage(CoreR.string.add_shortcut_msg)
-                setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                setButton(SuperSUDialog.ButtonType.NEGATIVE) {
                     text = android.R.string.cancel
                 }
-                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                setButton(SuperSUDialog.ButtonType.POSITIVE) {
                     text = android.R.string.ok
                     onClick {
                         Shortcuts.addHomeIcon(this@MainActivity)
