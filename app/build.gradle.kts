@@ -1,5 +1,5 @@
 plugins {
-    id("MagiskPlugin")
+    id("SuperSUPlugin")
 }
 
 tasks.register("clean", Delete::class) {

@@ -19,10 +19,6 @@
         android:title="@string/reboot_bootloader" />
 
     <item
-        android:id="@+id/action_reboot_download"
-        android:title="@string/reboot_download" />
-
-    <item
         android:id="@+id/action_reboot_edl"
         android:title="@string/reboot_edl" />
 

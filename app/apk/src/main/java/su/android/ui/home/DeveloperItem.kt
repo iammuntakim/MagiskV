@@ -9,28 +9,8 @@ interface Dev {
     val name: String
 }
 
-private interface JohnImpl : Dev {
-    override val name get() = "topjohnwu"
-}
-
-private interface VvbImpl : Dev {
-    override val name get() = "vvb2060"
-}
-
-private interface YUImpl : Dev {
-    override val name get() = "yujincheng08"
-}
-
-private interface RikkaImpl : Dev {
-    override val name get() = "rikkaw"
-}
-
-private interface CanyieImpl : Dev {
-    override val name get() = "canyie"
-}
-
-private interface MAImpl : Dev {
-    override val name get() = "mikailamin"
+private interface MuntakimImpl : Dev {
+    override val name get() = "Muntakim"
 }
 
 sealed class DeveloperItem : Dev {
@@ -38,51 +18,10 @@ sealed class DeveloperItem : Dev {
     abstract val items: List<IconLink>
     val handle get() = "@${name}"
 
-    object John : DeveloperItem(), JohnImpl {
-        override val items =
-            listOf<IconLink>(
-                object : IconLink.Twitter(), JohnImpl {},
-                object : IconLink.Github.User(), JohnImpl {}
-            )
-    }
-
-    object Vvb : DeveloperItem(), VvbImpl {
-        override val items =
-            listOf<IconLink>(
-                object : IconLink.Twitter(), VvbImpl {},
-                object : IconLink.Github.User(), VvbImpl {}
-            )
-    }
-
-    object YU : DeveloperItem(), YUImpl {
-        override val items =
-            listOf<IconLink>(
-                object : IconLink.Twitter() { override val name = "shanasaimoe" },
-                object : IconLink.Github.User(), YUImpl {},
-                object : IconLink.Sponsor(), YUImpl {}
-            )
-    }
-
-    object Rikka : DeveloperItem(), RikkaImpl {
-        override val items =
-            listOf<IconLink>(
-                object : IconLink.Twitter() { override val name = "rikkawww" },
-                object : IconLink.Github.User() { override val name = "RikkaW" },
-            )
-    }
-
-    object Canyie : DeveloperItem(), CanyieImpl {
-        override val items =
-            listOf<IconLink>(
-                object : IconLink.Twitter() { override val name = "canyie2977" },
-                object : IconLink.Github.User(), CanyieImpl {}
-            )
-    }
-
-    object MIKAILAMIN : DeveloperItem(), MAImpl {
+    object MIKAILAMIN : DeveloperItem(), MuntakimImpl {
         override val items =
             listOf(
-                object : IconLink.Github.User() { override val name = "mikailamin-master" },
+                object : IconLink.Github.User() { override val name = "iammuntakim" },
                 IconLink.Source
             )
     }
